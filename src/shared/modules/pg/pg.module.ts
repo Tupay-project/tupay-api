@@ -1,5 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
 // import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
 // import { CreditRequest } from 'src/features/credit/entities/credit.entity';
 // import { FundingProvider } from 'src/features/funding-provider/entitie/funding.entity';
@@ -38,7 +39,7 @@ import { SeedEntity } from 'src/shared/seed/entitie/seed-entity';
       // User,
       // Permission,
       // Role,
-      // ApiKey,
+      ApiKey,
       // FundingProvider,
       // CreditRequest,
       // WithdrawalRequest
