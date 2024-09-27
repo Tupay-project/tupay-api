@@ -1,13 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
-import { Transaction } from './transaction.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('webhook_logs')
 export class WebhookLog {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Transaction)
-  transaction: Transaction;
+
+  
+  @Column()
+  eventType: string;
+
+  @Column('text')
+  payload: string; // Almacena el payload completo como un JSON string
 
   @Column({ default: 'success' })
   status: string;
@@ -15,6 +19,4 @@ export class WebhookLog {
   @Column('json')
   response: Record<string, any>;
 
-  @CreateDateColumn()
-  createdAt: Date;
 }

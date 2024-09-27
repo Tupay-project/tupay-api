@@ -1,30 +1,23 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-
-
-@Entity('transactions')
-export class Transaction {
+@Entity('invoices')
+export class Invoice {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   amount: number;
-  
-  
-  @Column({ length: 50 })
-  type: string;
 
-
-
-
-
-  @Column({ length: 5 })
-  reference: string;
+  @Column()
+  dueDate: Date;
 
   @Column({ default: 'pending' })
   status: string;
 
- 
+  @Column({ length: 5 })
+  reference: string;
+
 
   @CreateDateColumn()
   createdAt: Date;
