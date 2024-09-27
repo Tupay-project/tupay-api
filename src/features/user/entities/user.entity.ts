@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Customer } from 'src/features/customer/entities/customer.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne } from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -22,6 +23,10 @@ export class User {
 
   @Column({ default: 'active' })
   status: string;
+
+  @OneToOne(() => Customer, customer => customer.user) 
+  @JoinColumn()
+  customer: Customer;
 
   @CreateDateColumn()
   createdAt: Date;

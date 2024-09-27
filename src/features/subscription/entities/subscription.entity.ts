@@ -1,4 +1,5 @@
-import { PrimaryGeneratedColumn, Column, Entity } from "typeorm";
+import { Customer } from "src/features/customer/entities/customer.entity";
+import { PrimaryGeneratedColumn, Column, Entity, ManyToOne } from "typeorm";
 
 
 @Entity('subscriptions')
@@ -12,4 +13,7 @@ export class Subscription {
   
     @Column()
     pacMandateId: string;  // ID del mandato PAC
+    
+  @ManyToOne(() => Customer, (customer) => customer.subscriptions)
+  customer: Customer;  // Relación con el cliente
 }

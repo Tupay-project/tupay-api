@@ -1,7 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Customer } from 'src/features/customer/entities/customer.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
 
 @Entity('invoices')
 export class Invoice {
+
+  
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -17,6 +20,12 @@ export class Invoice {
 
   @Column({ length: 5 })
   reference: string;
+
+  // 
+  
+  @ManyToOne(() => Customer, (customer) => customer.invoices)
+  customer: Customer; // Relación con el cliente
+
 
 
   @CreateDateColumn()
