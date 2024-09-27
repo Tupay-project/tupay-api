@@ -2,7 +2,7 @@ import { Module, Global } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
 import { Customer } from 'src/features/customer/entities/customer.entity';
-import { Provider } from 'src/features/funding-provider/entities/provider.entity';
+import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
 import { Invoice } from 'src/features/invoice/entities/invoice.entity';
 import { Payment } from 'src/features/manager/entities/payment.entity';
 import { Transaction } from 'src/features/manager/entities/transaction.entity';
@@ -51,8 +51,8 @@ import { SeedEntity } from 'src/shared/seed/entitie/seed-entity';
       Subscription,
       WebhookLog,
       Payment,
-      Provider,
-      Transaction,
+      FundingProvider,
+            Transaction,
       SeedEntity,
     ])
     
