@@ -33,5 +33,5 @@ jobs:
           TARGET: ${{ secrets.REMOTE_TARGET }}
           EXCLUDE: "/dist/, /node_modules/"
           SCRIPT_AFTER: |
-            ls && cd tupay-api && ls && npm ci
+            cd tupay-api && npm ci && pm2 reload ../ecosystem.config.js
           SCRIPT_AFTER_REQUIRED: true
