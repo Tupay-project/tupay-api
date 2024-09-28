@@ -1,65 +1,61 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InvoiceService } from '../invoice/invoice.service';
 import { TransactionService } from '../manager/services/transation.service';
-import { validate as isUUID } from 'uuid';  // Importar función para validar UUID
-import { Invoice } from '../invoice/entities/invoice.entity';
+import { WebhookService } from '../manager/services/webhook.service';
 import { ProcessPaymentDto } from './dto/ProcessPaymentDto';
+
 
 @Injectable()
 export class PaymentService {
   constructor(
     private readonly invoiceService: InvoiceService,
     private readonly transactionService: TransactionService,
+    private readonly webhookService: WebhookService, // Inyectamos el WebhookService
   ) {}
 
-  async processPayment(invoiceId: string, paymentData: ProcessPaymentDto): Promise<Invoice> {
-    // Verificamos si el invoiceId es un UUID válido
-    if (!isUUID(invoiceId)) {
-      throw new HttpException('El ID de la factura no es un UUID válido', HttpStatus.BAD_REQUEST);
-    }
-
-    // Buscar la factura en la base de datos
+  async processPayment(invoiceId: string, paymentData: ProcessPaymentDto): Promise<any> {
     const invoice = await this.invoiceService.findInvoiceById(invoiceId);
 
-    // Si no se encuentra la factura, lanzamos una excepción
     if (!invoice) {
-      throw new HttpException('Factura no encontrada', HttpStatus.NOT_FOUND);
+      throw new HttpException('Invoice not found', HttpStatus.NOT_FOUND);
     }
 
-    // Verificamos si la factura ya ha sido pagada
     if (invoice.status === 'paid') {
-      throw new HttpException('La factura ya ha sido pagada', HttpStatus.BAD_REQUEST);
+      throw new HttpException('The invoice has already been paid', HttpStatus.BAD_REQUEST);
     }
-    console.log('Tipo de invoice.amount:', typeof invoice.amount); // Debe mostrar 'number'
-    console.log('Tipo de paymentData.amount:', typeof paymentData.amount); // Debe mostrar 'number'
-    
-    // Comparamos el monto del pago con el monto de la factura
-    if (invoice.amount !== paymentData.amount) {
-      console.error('El monto del pago no coincide con el monto de la factura');
-      throw new HttpException('El monto del pago no coincide con el monto de la factura', HttpStatus.BAD_REQUEST);
-    }
-    
-    
 
-    // Actualizamos el estado de la factura a 'paid'
+    if (invoice.amount !== paymentData.amount) {
+      throw new HttpException('Payment amount does not match invoice amount', HttpStatus.BAD_REQUEST);
+    }
+
+    // Actualiza el estado de la factura
     invoice.status = 'paid';
     await this.invoiceService.updateInvoice(invoice);
 
-    // Creamos la transacción relacionada con el pago
-    const transaction = await this.transactionService.createTransaction({
+    // Crea la transacción asociada
+    await this.transactionService.createTransaction({
       invoiceId: invoice.id,
       amount: paymentData.amount,
       status: 'success',
       paymentMethod: paymentData.method,
       paymentReference: paymentData.paymentReference,
       providerId: paymentData.providerId,
-      reference: paymentData.reference,  // Referencia única de la transacción
+      reference: paymentData.reference,
     });
 
-    // Aquí puedes disparar un webhook o notificación si es necesario
-    // await this.webhookService.notify(paymentData);
+    // Envía la notificación webhook al proveedor
+    try {
+      await this.webhookService.notifyProvider({
+        id: invoice.id,
+        amount: invoice.amount,
+        status: invoice.status,
+        paymentReference: invoice.paymentReference,
+        customer: invoice.customer,
+      });
+    } catch (error) {
+      console.error('Error enviando el webhook:', error);
+    }
 
-    return invoice;  // Retornamos la factura actualizada
+    return invoice;
   }
 }

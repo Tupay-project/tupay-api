@@ -33,6 +33,10 @@ export class FundingProvider {
 
   @CreateDateColumn()
   createdAt: Date;
+  
+  @Column({ nullable: true })
+  webhookUrl: string; // Aquí se almacena la URL del webhook del proveedor
+
 
   @UpdateDateColumn()
   updatedAt: Date;

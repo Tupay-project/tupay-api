@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsPhoneNumber, IsString, IsUUID } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, IsUrl, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProviderDto {
@@ -26,4 +26,9 @@ export class CreateProviderDto {
   @IsUUID()
   @IsNotEmpty()
   providerId: string;  // ID del proveedor
+
+  @ApiProperty({ description: 'URL del webhook del proveedor', example: 'https://miwebhook.com/notify' })
+  @IsOptional()
+  @IsUrl()
+  webhookUrl?: string;
 }
