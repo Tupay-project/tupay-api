@@ -32,6 +32,5 @@ jobs:
           EXCLUDE: "/dist/, /node_modules/"
           SCRIPT_AFTER: |
             ls -la
-            cd tupay-api
-            npm i
+            cd tupay-api && npm ci
           SCRIPT_AFTER_REQUIRED: true
