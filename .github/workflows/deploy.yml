@@ -31,6 +31,7 @@ jobs:
           TARGET: ${{ secrets.REMOTE_TARGET }}
           EXCLUDE: "/dist/, /node_modules/"
           SCRIPT_AFTER: |
+            ls -la
             cd tupay-api
             npm i
           SCRIPT_AFTER_REQUIRED: true
