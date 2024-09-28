@@ -1,7 +1,8 @@
+import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
 import { Invoice } from 'src/features/invoice/entities/invoice.entity';
 import { Subscription } from 'src/features/subscription/entities/subscription.entity';
 import { User } from 'src/features/user/entities/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, ManyToOne } from 'typeorm';
 
 
 @Entity('customers')
@@ -31,6 +32,9 @@ export class Customer {
   
   @OneToOne(() => User, user => user.customer) // Relación uno a uno
   user: User; 
+
+  @ManyToOne(() => FundingProvider, (provider) => provider.customers, { eager: true })
+  provider: FundingProvider;
 
 
  

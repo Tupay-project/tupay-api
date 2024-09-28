@@ -1,29 +1,46 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Customer } from './entities/customer.entity';
 import { Repository } from 'typeorm';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { FundingProvider } from '../funding-provider/entities/provider.entity';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class CustomerService {
     constructor(
         @InjectRepository(Customer)
         private customersRepository: Repository<Customer>,
+
+
+    @InjectRepository(FundingProvider)
+    private readonly providerRepository: Repository<FundingProvider>,
     ) { }
-
-    async createCustomer(createCustomerDto: CreateCustomerDto): Promise<Customer> {
-        const { governmentId } = createCustomerDto;
-
-        // Verificar si el governmentId ya existe
-        const existingCustomer = await this.customersRepository.findOne({ where: { governmentId } });
-        if (existingCustomer) {
-            throw new ConflictException('Government ID already exists');
+    async createCustomer(createCustomerDto: CreateCustomerDto): Promise<Omit<Customer, 'provider'>> {
+        const provider = await this.providerRepository.findOne({ where: { id: createCustomerDto.providerId } });
+        
+        if (!provider) {
+          throw new Error('Provider not found');
         }
-
-        const newCustomer = this.customersRepository.create(createCustomerDto);
-        return await this.customersRepository.save(newCustomer);
-    }
+      
+        // Crear el cliente con el proveedor
+        const customer = this.customersRepository.create({
+          ...createCustomerDto,
+          provider, 
+        });
+      
+        // Guardar el cliente en la base de datos
+        const savedCustomer = await this.customersRepository.save(customer);
+      
+        // Eliminar el campo provider de la respuesta antes de devolverla
+        const { provider: _, ...customerWithoutProvider } = savedCustomer;
+      
+        return customerWithoutProvider;
+      }
+      
+      
 
     // Método para obtener un cliente por ID
     async getCustomerById(id: string): Promise<Customer> {

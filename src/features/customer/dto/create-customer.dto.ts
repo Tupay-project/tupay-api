@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsPhoneNumber, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsPhoneNumber, IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCustomerDto {
@@ -21,4 +21,10 @@ export class CreateCustomerDto {
   @IsPhoneNumber(null)
   @IsNotEmpty()
   phoneNumber: string;  // Número de teléfono del cliente
+  @ApiProperty({ description: 'ID del proveedor asociado', example: '4e91e43b-c8e7-4782-b3c9-0d318f801fd9' })
+ 
+ 
+  @IsUUID()
+  @IsNotEmpty()
+  providerId: string;  // ID del proveedor
 }

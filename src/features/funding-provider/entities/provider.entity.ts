@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Customer } from 'src/features/customer/entities/customer.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 
 @Entity('providers')
 export class FundingProvider {
@@ -22,6 +23,9 @@ export class FundingProvider {
 
   @Column({ unique: true })
   privateKey: string;
+
+  @OneToMany(() => Customer, (customer) => customer.provider)
+  customers: Customer[];
 
   @CreateDateColumn()
   createdAt: Date;

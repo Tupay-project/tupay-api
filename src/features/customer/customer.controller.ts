@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateCustomerDto } from './dto/create-customer.dto';
@@ -11,12 +11,17 @@ export class CustomerController {
   constructor(private readonly customersService: CustomerService) {}
 
 
-  
   @Post('create')
-  @ApiOperation({ summary: 'Crear un nuevo cliente' })
-  @ApiResponse({ status: 201, description: 'El cliente ha sido creado.', type: Customer })
+  @ApiOperation({ summary: 'Crear un cliente asociado a un proveedor' })
+  @ApiResponse({ status: 201, description: 'Cliente creado con éxito' })
+  @ApiResponse({ status: 400, description: 'Error al crear el cliente' })
   async createCustomer(@Body() createCustomerDto: CreateCustomerDto): Promise<Customer> {
-    return this.customersService.createCustomer(createCustomerDto);
+    try {
+      const customer = await this.customersService.createCustomer(createCustomerDto);
+      return customer;
+    } catch (error) {
+      throw new HttpException('Error al crear el cliente', HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get(':id')

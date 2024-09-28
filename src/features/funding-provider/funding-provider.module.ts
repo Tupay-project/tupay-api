@@ -6,6 +6,7 @@ import { ApiKeyModule } from '../api-key/api-key.module';
 @Module({
   controllers: [FundingProviderController],
   providers: [FundingProviderService],
-  imports:[ApiKeyModule]
+  imports:[ApiKeyModule],
+  exports:[FundingProviderService]
 })
 export class FundingProviderModule {}
