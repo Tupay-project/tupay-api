@@ -8,6 +8,8 @@ import { Invoice } from 'src/features/invoice/entities/invoice.entity';
 import { Payment } from 'src/features/manager/entities/payment.entity';
 import { Transaction } from 'src/features/manager/entities/transaction.entity';
 import { WebhookLog } from 'src/features/manager/entities/webhook-log.entity';
+import { Permission } from 'src/features/role/entities/permission.entity';
+import { Role } from 'src/features/role/entities/roles.entity';
 import { User } from 'src/features/user/entities/user.entity';
 // import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
 // import { CreditRequest } from 'src/features/credit/entities/credit.entity';
@@ -45,6 +47,8 @@ import { SeedEntity } from 'src/shared/seed/entitie/seed-entity';
 
     TypeOrmModule.forFeature([
       User,
+      Role,
+      Permission,
       ApiKey,
       Invoice,
       Customer,

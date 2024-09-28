@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './shared/pipes/all-exceptions.filter';
 import { envs } from './shared/config';
-import { DocumentationModule } from './shared/modules/documentation/documentation.module';
 // import { WebhookService } from './shared/services/webhook.service';
 
 async function bootstrap() {
@@ -33,7 +32,7 @@ async function bootstrap() {
   });
 
     // Configurar la documentación Swagger en un módulo aparte
-    await DocumentationModule.setup(app);
+    // await DocumentationModule.setup(app);
 
 
   // const webhookService = app.get(WebhookService);

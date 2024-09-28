@@ -12,6 +12,8 @@ import { SeedModule } from './shared/seed/seed.module';
 import { CustomerModule } from './features/customer/customer.module';
 import { InvoiceModule } from './features/invoice/invoice.module';
 import { PaymentModule } from './features/payment/payment.module';
+import { RoleModule } from './features/role/role.module';
+import { RolesService } from './features/role/role.service';
 
 @Module({
   imports: [
@@ -32,9 +34,10 @@ import { PaymentModule } from './features/payment/payment.module';
     CustomerModule,
     InvoiceModule,
     PaymentModule,
+    RoleModule,
   
   ],
   controllers: [],
-  providers: [AppService],
+  providers: [AppService,RolesService],
 })
 export class AppModule {}

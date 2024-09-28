@@ -1,48 +1,61 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql'; // Importa los decoradores de GraphQL
 import { Customer } from 'src/features/customer/entities/customer.entity';
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne } from 'typeorm';
+import { Role } from 'src/features/role/entities/roles.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne, ManyToMany, JoinTable } from 'typeorm';
 
 @ObjectType() // Decorador para GraphQL
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  @Field(() => ID) // Decorador de campo para GraphQL
+  @Field(() => ID)
   id: string;
 
   @Column({ length: 100 })
-  @Field() // Decorador de campo para GraphQL
+  @Field()
   name: string;
 
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  password: string
+
   @Column({ unique: true })
-  @Field() // Decorador de campo para GraphQL
+  @Field()
   email: string;
 
-  @Column({ length: 20 })
-  @Field() // Decorador de campo para GraphQL
-  role: string;
+  @Field(() => [Role])
+  @ManyToMany(() => Role)
+  @JoinTable({
+    name: 'user_roles',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
+  })
+  roles: Role[];
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
-  @Field() // Decorador de campo para GraphQL
+  @Field()
   balance: number;
 
-  @Column({ unique: true, length: 20 })
-  @Field() // Decorador de campo para GraphQL
-  accountNumber: string;
+  @Column({ unique: true, length: 20, nullable: true })
+  @Field({ nullable: true })
 
+  accountNumber: string;
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  profilePicture: string
   @Column({ default: 'active' })
-  @Field() // Decorador de campo para GraphQL
+  @Field()
   status: string;
 
-  @OneToOne(() => Customer, customer => customer.user) 
+  @OneToOne(() => Customer, customer => customer.user)
   @JoinColumn()
-  @Field(() => Customer) // Decorador de campo para GraphQL
+  @Field(() => Customer)
   customer: Customer;
 
   @CreateDateColumn()
-  @Field() // Decorador de campo para GraphQL
+  @Field()
   createdAt: Date;
 
   @UpdateDateColumn()
-  @Field() // Decorador de campo para GraphQL
+  @Field()
   updatedAt: Date;
 }
