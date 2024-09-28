@@ -1,4 +1,5 @@
 import { Customer } from 'src/features/customer/entities/customer.entity';
+import { Transaction } from 'src/features/manager/entities/transaction.entity';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 
 @Entity('providers')
@@ -26,6 +27,9 @@ export class FundingProvider {
 
   @OneToMany(() => Customer, (customer) => customer.provider)
   customers: Customer[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.provider)
+  transactions: Transaction[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -1,8 +1,8 @@
 import { Controller, Post, Body, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { FundingProviderService } from './funding-provider.service';
-import { CreateProviderDto } from './dto/CreateProviderDto';
 import { FundingProvider } from './entities/provider.entity';
+import { CreateProviderDto } from './dto/CreateProviderDto';
 
 
 @Controller('funding-provider')

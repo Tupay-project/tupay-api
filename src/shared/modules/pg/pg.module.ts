@@ -3,11 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
 import { Customer } from 'src/features/customer/entities/customer.entity';
 import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
+import { BankTransaction } from 'src/features/invoice/entities/bank-transaction.entity';
 import { Invoice } from 'src/features/invoice/entities/invoice.entity';
 import { Payment } from 'src/features/manager/entities/payment.entity';
 import { Transaction } from 'src/features/manager/entities/transaction.entity';
 import { WebhookLog } from 'src/features/manager/entities/webhook-log.entity';
-import { Subscription } from 'src/features/subscription/entities/subscription.entity';
 import { User } from 'src/features/user/entities/user.entity';
 // import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
 // import { CreditRequest } from 'src/features/credit/entities/credit.entity';
@@ -28,7 +28,7 @@ import { SeedEntity } from 'src/shared/seed/entitie/seed-entity';
       host: envs.DATABASE_HOST,
       port: 5432,
       username: envs.DATABASE_USERNAME,
-      password:envs.DATABASE_PASSWORD,
+      password: envs.DATABASE_PASSWORD,
       database: envs.DATABASE_NAME,
       synchronize: true,
       autoLoadEntities: true,
@@ -46,16 +46,16 @@ import { SeedEntity } from 'src/shared/seed/entitie/seed-entity';
     TypeOrmModule.forFeature([
       User,
       ApiKey,
-      Invoice,  
+      Invoice,
       Customer,
-      Subscription,
       WebhookLog,
       Payment,
       FundingProvider,
-            Transaction,
+      BankTransaction,
+      Transaction,
       SeedEntity,
     ])
-    
+
 
 
   ],

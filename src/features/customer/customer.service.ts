@@ -6,7 +6,6 @@ import { Repository } from 'typeorm';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { FundingProvider } from '../funding-provider/entities/provider.entity';
-import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class CustomerService {

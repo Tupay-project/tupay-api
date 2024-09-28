@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, IsPhoneNumber, IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateCustomerDto {
+export class CreateProviderDto {
   @ApiProperty({ description: 'ID del gobierno (cédula o similar)', example: '1234567890' })
   @IsString()
   @IsNotEmpty()

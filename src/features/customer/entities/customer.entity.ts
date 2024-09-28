@@ -1,6 +1,5 @@
 import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
 import { Invoice } from 'src/features/invoice/entities/invoice.entity';
-import { Subscription } from 'src/features/subscription/entities/subscription.entity';
 import { User } from 'src/features/user/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, ManyToOne } from 'typeorm';
 
@@ -25,9 +24,6 @@ export class Customer {
   // integrations
   @OneToMany(() => Invoice, (invoice) => invoice.customer)
   invoices: Invoice[];
-
-  @OneToMany(() => Subscription, (subscription) => subscription.customer)
-  subscriptions: Subscription[];
 
   
   @OneToOne(() => User, user => user.customer) // Relación uno a uno
