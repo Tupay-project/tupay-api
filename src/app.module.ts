@@ -11,6 +11,7 @@ import { IntegrationsModule } from './features/integrations/integrations.module'
 import { SeedModule } from './shared/seed/seed.module';
 import { CustomerModule } from './features/customer/customer.module';
 import { InvoiceModule } from './features/invoice/invoice.module';
+import { PaymentModule } from './features/payment/payment.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { InvoiceModule } from './features/invoice/invoice.module';
     SeedModule,
     CustomerModule,
     InvoiceModule,
+    PaymentModule,
   
   ],
   controllers: [],

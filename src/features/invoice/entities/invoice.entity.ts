@@ -10,8 +10,12 @@ export class Invoice {
   @ManyToOne(() => Customer, (customer) => customer.invoices, { eager: true })
   customer: Customer;
 
-  @Column('decimal', { precision: 10, scale: 2 })
-  amount: number;  // Monto total de la factura
+  @Column('decimal', { precision: 10, scale: 2, transformer: { 
+    to: (value: number) => value, 
+    from: (value: string) => parseFloat(value)
+  }
+})
+amount: number; 
 
   @Column()
   description: string;  // Descripción del producto o servicio
