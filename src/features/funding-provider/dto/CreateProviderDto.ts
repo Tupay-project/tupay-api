@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, IsUrl, IsUUID } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString, IsUrl, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProviderDto {
@@ -27,8 +27,23 @@ export class CreateProviderDto {
   @IsNotEmpty()
   providerId: string;  // ID del proveedor
 
+  @ApiProperty({ description: 'Número de cuenta del proveedor', example: '1234567890' })  // Asegúrate de incluir esto
+  @IsString()
+  @IsNotEmpty()
+  accountNumber: string;  // Número de cuenta del proveedor
+
   @ApiProperty({ description: 'URL del webhook del proveedor', example: 'https://miwebhook.com/notify' })
   @IsOptional()
   @IsUrl()
   webhookUrl?: string;
+
+  @ApiProperty({ description: 'Tipo de proveedor (persona o compañía)', example: 'company' })
+  @IsString()
+  @IsNotEmpty()
+  type: string;  // Tipo de proveedor
+
+  @ApiProperty({ description: 'Fondos disponibles', example: 1000000 })
+  @IsNumber()
+  @IsNotEmpty()
+  availableFunds: number;
 }

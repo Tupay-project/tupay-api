@@ -3,6 +3,9 @@ import { InvoiceService } from '../invoice/invoice.service';
 import { TransactionService } from '../manager/services/transation.service';
 import { WebhookService } from '../manager/services/webhook.service';
 import { ProcessPaymentDto } from './dto/ProcessPaymentDto';
+import { Payment } from '../manager/entities/payment.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 
 @Injectable()
@@ -10,7 +13,11 @@ export class PaymentService {
   constructor(
     private readonly invoiceService: InvoiceService,
     private readonly transactionService: TransactionService,
-    private readonly webhookService: WebhookService, // Inyectamos el WebhookService
+    private readonly webhookService: WebhookService, 
+    @InjectRepository(Payment) // Inyecta el repositorio de Payment
+
+    private readonly paymentRepository: Repository<Payment>,
+
   ) {}
 
   async processPayment(invoiceId: string, paymentData: ProcessPaymentDto): Promise<any> {
@@ -57,5 +64,20 @@ export class PaymentService {
     }
 
     return invoice;
+  }
+
+  async getAllPayments(): Promise<Payment[]> {
+    return this.paymentRepository.find();
+  }
+
+  // Método para obtener un pago por ID
+  async getPaymentById(id: string): Promise<Payment> {
+    const payment = await this.paymentRepository.findOne({ where: { id } });
+
+    if (!payment) {
+      throw new HttpException('Pago no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    return payment;
   }
 }

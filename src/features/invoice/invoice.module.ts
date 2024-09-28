@@ -7,5 +7,6 @@ import { BankTransactionService } from './services/bank-transaction.service';
 @Module({
   controllers: [InvoiceController,BankTransactionController],
   providers: [InvoiceService,BankTransactionService],
+  exports:[InvoiceService,BankTransactionService]
 })
 export class InvoiceModule {}

@@ -18,7 +18,8 @@ export class FundingProviderController {
       const provider = await this.fundingProviderService.createProvider(createProviderDto);
       return provider;
     } catch (error) {
-      throw new HttpException('Error al crear el proveedor', HttpStatus.BAD_REQUEST);
+      console.error('Error en el controlador al crear el proveedor:', error);  // Registrar el error
+      throw new HttpException(`Error al crear el proveedor: ${error.message}`, HttpStatus.BAD_REQUEST);  // Lanzar una excepción con detalles
     }
   }
 

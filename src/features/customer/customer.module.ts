@@ -6,6 +6,7 @@ import { FundingProviderModule } from '../funding-provider/funding-provider.modu
 @Module({
   controllers: [CustomerController],
   providers: [CustomerService],
-  imports:[FundingProviderModule]
+  imports:[FundingProviderModule],
+  exports:[CustomerService]
 })
 export class CustomerModule {}
