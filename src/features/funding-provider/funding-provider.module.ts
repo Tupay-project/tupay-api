@@ -5,11 +5,15 @@ import { ApiKeyModule } from '../api-key/api-key.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { envs } from 'src/shared/config';
+import { HttpModule } from '@nestjs/axios';
+import { WebhookControllerTransfeProvider } from './controllers/webhook.controller';
+import { WebhookServiceTransfeProviders } from './services/webkook-transfe_provider.service';
 
 @Module({
-  controllers: [FundingProviderController],
-  providers: [FundingProviderService],
-  imports:[ApiKeyModule,  PassportModule.register({ defaultStrategy: 'jwt' }),
+  controllers: [FundingProviderController,WebhookControllerTransfeProvider],
+  providers: [FundingProviderService,WebhookServiceTransfeProviders],
+  imports:[ApiKeyModule,  
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       useFactory: () => {
         return {
@@ -17,7 +21,10 @@ import { envs } from 'src/shared/config';
           secret: envs.JWT_ACCESS_TOKEN_SECRET,
         };
       },
-    }),],
+    }),
+    HttpModule
+  
+  ],
   exports:[FundingProviderService]
 })
 export class FundingProviderModule {}

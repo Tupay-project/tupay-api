@@ -7,7 +7,7 @@ import { Invoice } from 'src/features/invoice/entities/invoice.entity';
 @Entity('transactions')
 export class Transaction {
   @PrimaryGeneratedColumn('uuid')
-  @Field(() => ID) // Decorador de campo para GraphQL
+  @Field(() => ID) 
   id: string;
 
   @ManyToOne(() => Invoice, (invoice) => invoice.transactions, { eager: true })
@@ -19,26 +19,31 @@ export class Transaction {
   provider: FundingProvider;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  @Field() // Decorador de campo para GraphQL
+  @Field() 
   amount: number;
 
   @Column()
-  @Field() // Decorador de campo para GraphQL
+  @Field() 
   paymentReference: string;  // Referencia de pago generada
 
   @Column({ default: 'success' })
-  @Field() // Decorador de campo para GraphQL
+  @Field() 
   status: string;  // 'success' o 'failed'
 
   @CreateDateColumn()
-  @Field() // Decorador de campo para GraphQL
+  @Field() 
   createdAt: Date;
 
   @Column({ nullable: true })
-  @Field({ nullable: true }) // Decorador de campo para GraphQL
+  @Field({ nullable: true }) 
   failureReason?: string;  // Motivo del fallo en caso de 'failed'
+  
+  
+  @Field({ nullable: true }) 
+  @Column()
+  type: 'credit' | 'debit'; 
 
   @Column({ type: 'json', nullable: true })
-  @Field(() => String, { nullable: true }) // Decorador de campo para GraphQL, se usa String para JSON
+  @Field(() => String, { nullable: true })
   metadata?: Record<string, any>;  // Datos adicionales como la respuesta del banco, etc.
 }
