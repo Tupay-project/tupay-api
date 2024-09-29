@@ -1,11 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { Customer } from './entities/customer.entity';
+import { JwtGuard } from '../auth/auth/auth.guard';
 
 @ApiTags('customers')
 @Controller('customer')
+@UseGuards(JwtGuard)
 export class CustomerController {
   constructor(private readonly customersService: CustomerService) {}
 

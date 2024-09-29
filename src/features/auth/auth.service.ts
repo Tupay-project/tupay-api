@@ -11,6 +11,7 @@ import { AuthLoginDto } from './dto/login.auth.dto';
 
 @Injectable()
 export class AuthService {
+ 
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
@@ -72,7 +73,7 @@ export class AuthService {
         // Buscar el usuario por email, incluyendo los roles y los permisos de esos roles
         const userExist = await this.userRepository.findOne({ 
             where: { email },
-            relations: ['roles', 'roles.permissions'], // Incluir la relación de roles y sus permisos
+            relations: ['roles', 'roles.permissions'], 
         });
     
         if (!userExist) throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -102,7 +103,14 @@ export class AuthService {
         return data;
     }
     
-    public async currentUser() { }
+
+    async currentUser(userId: string): Promise<User | null> {
+        const user = await this.userRepository.findOne({ where: { id: userId },             relations: ['roles', 'roles.permissions'] });
+        if (!user) {
+          return null;
+        }
+        return user;
+      }
 
     public async logout() { }
 }
