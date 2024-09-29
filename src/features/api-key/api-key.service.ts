@@ -30,9 +30,27 @@ export class ApiKeyService {
 
   }
   async validateKeys(accessKey: string, privateKey: string): Promise<boolean> {
-    const clientKey = await this.clientKeyRepository.findOne({ where: { accessKey, privateKey } });
-    return !!clientKey; 
+    console.log('AccessKey enviada:', accessKey.trim());
+    console.log('PrivateKey enviada:', privateKey.trim());
+  
+    // Intentar encontrar una clave que coincida
+    const clientKey = await this.clientKeyRepository.findOne({
+      where: { accessKey: accessKey.trim(), privateKey: privateKey.trim() }
+    });
+  
+    if (!clientKey) {
+      console.error('No se encontraron claves que coincidan. AccessKey:', accessKey.trim(), 'PrivateKey:', privateKey.trim());
+    } else {
+      console.log('Claves válidas encontradas:', clientKey);
+    }
+  
+    const isValid = !!clientKey;
+    console.log('Resultado de la validación:', isValid); // Log adicional
+    return isValid;
   }
+  
+  
+  
 
   async validateAccessKey(accessKey: string): Promise<boolean> {
     console.log('Validating AccessKey:', accessKey); // Log para ver la clave que se está validando
@@ -50,6 +68,18 @@ export class ApiKeyService {
     return this.clientKeyRepository.find();
   }
 
+  async findApiKeyByKeys(accessKey: string, privateKey: string): Promise<ApiKey> {
+    const apiKey = await this.clientKeyRepository.findOne({
+      where: { accessKey: accessKey.trim(), privateKey: privateKey.trim() },
+    });
+
+    if (!apiKey) {
+      console.error('ApiKey no encontrada para AccessKey:', accessKey, 'y PrivateKey:', privateKey);
+      return null;
+    }
+
+    return apiKey;
+  }
   
 
 }

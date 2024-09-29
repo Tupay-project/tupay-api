@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql'; // Importa los decoradores de GraphQL
+import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
 import { Customer } from 'src/features/customer/entities/customer.entity';
 import { Transaction } from 'src/features/manager/entities/transaction.entity';
 import { User } from 'src/features/user/entities/user.entity';
@@ -59,7 +60,8 @@ export class FundingProvider {
 
   @ManyToOne(() => User, user => user.providers)  // Un proveedor es creado por un solo usuario
   createdBy: User;  // Almacena la referencia al usuario que creó el proveedor
-
+  @OneToMany(() => ApiKey, (apiKey) => apiKey.fundingProvider)
+  apiKeys: ApiKey[]; 
 
   @UpdateDateColumn()
   @Field() 
