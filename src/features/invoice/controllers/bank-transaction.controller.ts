@@ -13,4 +13,6 @@ export class BankTransactionController {
   ) {
     return this.transactionService.updateTransactionStatus(invoiceId, providerId, status);
   }
+
+  
 }

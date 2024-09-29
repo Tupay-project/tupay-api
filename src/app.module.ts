@@ -14,6 +14,7 @@ import { InvoiceModule } from './features/invoice/invoice.module';
 import { PaymentModule } from './features/payment/payment.module';
 import { RoleModule } from './features/role/role.module';
 import { RolesService } from './features/role/role.service';
+import { LoanModule } from './features/loan/loan.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { RolesService } from './features/role/role.service';
     
     FundingProviderModule,
     ManagerModule,
+    LoanModule,
     IntegrationsModule,
     SeedModule,
     CustomerModule,

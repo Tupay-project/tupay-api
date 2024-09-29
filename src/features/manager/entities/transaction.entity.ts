@@ -2,6 +2,7 @@ import { ObjectType, Field, ID } from '@nestjs/graphql'; // Importa los decorado
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne } from 'typeorm';
 import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';  // Ajusta el path a la entidad FundingProvider
 import { Invoice } from 'src/features/invoice/entities/invoice.entity';
+import { Loan } from 'src/features/loan/entities/loan.entity';
 
 @ObjectType() // Decorador para GraphQL
 @Entity('transactions')
@@ -38,6 +39,9 @@ export class Transaction {
   @Field({ nullable: true }) 
   failureReason?: string;  // Motivo del fallo en caso de 'failed'
   
+
+  @ManyToOne(() => Loan, load => load.transactions)
+  loan: Loan;
   
   @Field({ nullable: true }) 
   @Column()

@@ -5,6 +5,7 @@ import { Customer } from 'src/features/customer/entities/customer.entity';
 import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
 import { BankTransaction } from 'src/features/invoice/entities/bank-transaction.entity';
 import { Invoice } from 'src/features/invoice/entities/invoice.entity';
+import { Loan } from 'src/features/loan/entities/loan.entity';
 import { Payment } from 'src/features/manager/entities/payment.entity';
 import { Transaction } from 'src/features/manager/entities/transaction.entity';
 import { WebhookLog } from 'src/features/manager/entities/webhook-log.entity';
@@ -58,6 +59,8 @@ import { SeedEntity } from 'src/shared/seed/entitie/seed-entity';
       BankTransaction,
       Transaction,
       SeedEntity,
+      // 
+      Loan
     ])
 
 

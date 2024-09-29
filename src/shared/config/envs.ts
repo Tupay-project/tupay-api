@@ -18,6 +18,8 @@ interface EnvVars {
   TOKU_ACCOUNT_KEY: string;
   TOKU_API_KEY: string;
   TOKU_API_BASE_URL: string;
+  // 
+  STRIPE_SECRET_KEY:string
 }
 
 // Esquema de validación con Joi
@@ -38,6 +40,10 @@ const envsSchema = joi.object({
   TOKU_ACCOUNT_KEY: joi.string().required(),
   TOKU_API_KEY: joi.string().required(),
   TOKU_API_BASE_URL: joi.string().uri().required(),
+
+  // 
+  STRIPE_SECRET_KEY: joi.string(),
+
 }).unknown(true);
 
 // Validación de las variables de entorno
@@ -71,4 +77,5 @@ export const envs = {
   TOKU_ACCOUNT_KEY: envVars.TOKU_ACCOUNT_KEY,
   TOKU_API_KEY: envVars.TOKU_API_KEY,
   TOKU_API_BASE_URL: envVars.TOKU_API_BASE_URL,
+  STRIPE_SECRET_KEY: envVars.STRIPE_SECRET_KEY,
 };

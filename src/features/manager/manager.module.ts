@@ -10,7 +10,13 @@ import { PaymentModule } from '../payment/payment.module';
 import { InvoiceModule } from '../invoice/invoice.module';
 
 @Module({
-  imports:[InvoiceModule,HttpModule,FundingProviderModule,CustomerModule,PaymentModule],
+  imports:[
+    InvoiceModule,
+    HttpModule,
+    FundingProviderModule,
+    CustomerModule,
+    PaymentModule
+  ],
   exports: [WebhookService],
   providers: [ManagerResolver, ManagerService,TransactionService,WebhookService],
 })

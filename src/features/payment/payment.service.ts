@@ -6,17 +6,31 @@ import { ProcessPaymentDto } from './dto/ProcessPaymentDto';
 import { Payment } from '../manager/entities/payment.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import Stripe from 'stripe';
+import { envs } from 'src/shared/config';
+import { Loan } from '../loan/entities/loan.entity';
+import { Transaction } from '../manager/entities/transaction.entity';
 
 
 @Injectable()
 export class PaymentService {
+
+  private readonly stripe =new Stripe(envs.STRIPE_SECRET_KEY)
   constructor(
     private readonly invoiceService: InvoiceService,
     private readonly transactionService: TransactionService,
     private readonly webhookService: WebhookService, 
-    @InjectRepository(Payment) // Inyecta el repositorio de Payment
-
+    @InjectRepository(Payment) 
     private readonly paymentRepository: Repository<Payment>,
+
+    @InjectRepository(Loan) 
+    private readonly loanRepository: Repository<Loan>,
+
+    
+    @InjectRepository(Transaction) 
+    private readonly transactionRepository: Repository<Transaction>,
+
+
 
   ) {}
 
@@ -80,4 +94,7 @@ export class PaymentService {
 
     return payment;
   }
+
+
+  
 }

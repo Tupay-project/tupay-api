@@ -23,38 +23,6 @@ export class InvoiceController {
       throw new HttpException('Error al procesar la solicitud de factura', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  // @Post('pay')
-  // @ApiOperation({ summary: 'Procesar el pago de una factura' })
-  // @ApiResponse({ status: 200, description: 'Pago procesado con éxito' })
-  // @ApiResponse({ status: 400, description: 'El monto del pago no coincide con el monto de la factura' })
-  // @ApiResponse({ status: 404, description: 'Factura no encontrada o número de convenio incorrecto' })
-  // async payInvoice(
-  //   @Body('paymentReference') paymentReference: string,
-  //   @Body('numberAgreement') numberAgreement: string,
-  //   @Body('paymentAmount') paymentAmount: number
-  // ) {
-  //   try {
-  //     const invoice = await this.invoiceService.processPayment(paymentReference, numberAgreement, paymentAmount);
-  //     return { message: 'Pago procesado con éxito', invoice };
-  //   } catch (error) {
-  //     // Captura de error con detalle del mismo
-  //     console.error('Error processing payment:', error.message);
-  //     throw new HttpException(error.message, error.status || HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-  // }
-
-  // @Post('webhook')
-  // @ApiOperation({ summary: 'Recibir notificación de pago desde un proveedor externo' })
-  // @ApiResponse({ status: 200, description: 'Webhook recibido y procesado' })
-  // @ApiResponse({ status: 500, description: 'Error al procesar el webhook' })
-  // async receiveWebhook(@Body() webhookData: { invoiceId: string; paymentStatus: string }) {
-  //   try {
-  //     const invoice = await this.invoiceService.handleWebhook(webhookData.invoiceId, webhookData.paymentStatus);
-  //     return { message: `Invoice status updated to ${invoice.status}`, invoice };
-  //   } catch (error) {
-  //     throw new HttpException(error.message || 'Error al procesar el webhook', HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-  // }
 
   @Get('all')
   @ApiOperation({ summary: 'Obtener todas las facturas' })
@@ -67,4 +35,7 @@ export class InvoiceController {
       throw new HttpException('Error al obtener las facturas', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  // stripe
+  
 }
