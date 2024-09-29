@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString, IsUrl, IsUUID } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProviderDto {
@@ -18,7 +18,6 @@ export class CreateProviderDto {
   name: string;  // Nombre del cliente
 
   @ApiProperty({ description: 'Número de teléfono del cliente', example: '+573004567890' })
-  @IsPhoneNumber(null)
   @IsNotEmpty()
   phoneNumber: string;  // Número de teléfono del cliente
 

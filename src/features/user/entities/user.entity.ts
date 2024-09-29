@@ -1,7 +1,8 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql'; // Importa los decoradores de GraphQL
 import { Customer } from 'src/features/customer/entities/customer.entity';
+import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
 import { Role } from 'src/features/role/entities/roles.entity';
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 
 @ObjectType() // Decorador para GraphQL
 @Entity('users')
@@ -50,6 +51,10 @@ export class User {
   @JoinColumn()
   @Field(() => Customer)
   customer: Customer;
+
+  @OneToMany(() => FundingProvider, provider => provider.createdBy)
+  providers: FundingProvider[];  // Un usuario puede crear varios proveedores
+
 
   @CreateDateColumn()
   @Field()

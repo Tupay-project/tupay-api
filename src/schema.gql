@@ -42,6 +42,7 @@ type FundingProvider {
   status: String!
   type: String!
   privateKey: String!
+  accessKey: String!
   customers: [Customer!]!
   transactions: [Transaction!]!
   createdAt: DateTime!
