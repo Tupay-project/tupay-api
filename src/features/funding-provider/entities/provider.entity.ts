@@ -1,6 +1,7 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql'; // Importa los decoradores de GraphQL
 import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
 import { Customer } from 'src/features/customer/entities/customer.entity';
+import { Loan } from 'src/features/loan/entities/loan.entity';
 import { Transaction } from 'src/features/manager/entities/transaction.entity';
 import { User } from 'src/features/user/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne } from 'typeorm';
@@ -45,6 +46,10 @@ export class FundingProvider {
   @OneToMany(() => Transaction, (transaction) => transaction.provider)
   @Field(() => [Transaction]) // Indica que es una lista de Transaction en GraphQL
   transactions: Transaction[];
+
+  @OneToMany(() => Loan, loan => loan.provider) // Relación con los préstamos
+  loans: Loan[]; // Lista de préstamos asociados a este proveedor
+
 
   @CreateDateColumn()
   @Field() 

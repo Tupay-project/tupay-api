@@ -1,48 +1,69 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Controller, Post, Body, Param, Get } from "@nestjs/common";
-import { ApiTags, ApiOperation, ApiParam } from "@nestjs/swagger";
+import { Controller, Post, Body,Param, UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ProviderTopUpService } from '../services/ProviderTopUpService';
+import { ApiKeyGuard } from '../guard/api-key.guard';
+import { AddProviderFundsDto } from '../dto/AddProviderFundsDto';
 
-@Controller('payments/top-ups')
-@ApiTags('Top-ups')
-export class TopUpController {
+@ApiTags('ProviderTopUp')
+@Controller('funding-provider')
+@UseGuards(ApiKeyGuard)  // Usamos el guard aquí para proteger las rutas
+export class ProviderTopUpController {
+
+  constructor(private readonly providerTopUpService: ProviderTopUpService) {}
+
+  @Post('top-up')
+  async initiateTopUp(@Body() addProviderFundsDto: AddProviderFundsDto) {
+    const { amount, providerId, currency } = addProviderFundsDto;
   
-  @Post('request')
-  @ApiOperation({ summary: 'Solicitar recarga para el proveedor' })
-  requestTopUp(@Body() topUpRequestDto: any) {
-    return 'Solicitud de recarga recibida';
+    // Lógica de la recarga
+    const { paymentLink, paymentReference } = await this.providerTopUpService.initiateTopUp(addProviderFundsDto);
+    
+    return {
+
+      message: 'Recarga iniciada exitosamente. Completa el pago en el siguiente enlace.',
+      paymentLink,
+      paymentReference, 
+      amount,
+      providerId,
+      currency
+    };
+  }
+  
+
+
+  
+  @Post('create-transaction/:providerId')
+  @ApiOperation({ summary: 'Crear transacción de recarga de fondos' })
+  async createTopUpTransaction(
+    @Param('providerId') providerId: string, 
+    @Body('amount') amount: number
+  ): Promise<void> {
+    await this.providerTopUpService.createTopUpTransaction(providerId, amount);
   }
 
-  @Post('process/:topUpId')
-  @ApiOperation({ summary: 'Procesar una recarga' })
-  @ApiParam({ name: 'topUpId', description: 'ID de la recarga a procesar' })
-  processTopUp(@Param('topUpId') topUpId: string) {
-    return `Recarga procesada para el ID ${topUpId}`;
+  @Post('confirm/:providerId')
+  @ApiOperation({ summary: 'Confirmar recarga de fondos después del pago' })
+  async confirmTopUp(
+    @Param('providerId') providerId: string, 
+   
+  ): Promise<void> {
+    await this.providerTopUpService.confirmTopUp(providerId);
   }
 
-  @Post('confirm/:topUpId')
-  @ApiOperation({ summary: 'Confirmar una recarga' })
-  @ApiParam({ name: 'topUpId', description: 'ID de la recarga a confirmar' })
-  confirmTopUp(@Param('topUpId') topUpId: string) {
-    return `Recarga confirmada para el ID ${topUpId}`;
+  @Post('webhook')
+  @ApiOperation({ summary: 'Procesar webhook de Stripe' })
+  async handleTopUpWebhook(@Body() webhookData: any): Promise<void> {
+    // Llamada al servicio para manejar el webhook de Stripe
+    await this.providerTopUpService.handleTopUpWebhook(webhookData);
   }
 
-  @Get('provider/:providerId/balance')
-  @ApiOperation({ summary: 'Obtener el saldo del proveedor' })
-  @ApiParam({ name: 'providerId', description: 'ID del proveedor' })
-  getProviderBalance(@Param('providerId') providerId: string) {
-    return `Saldo del proveedor ${providerId}`;
-  }
 
-  @Post('create-transaction')
-  @ApiOperation({ summary: 'Crear transacción de recarga' })
-  createTopUpTransaction(@Body() topUpTransactionDto: any) {
-    return 'Transacción de recarga creada';
-  }
-
-  @Get('provider/:providerId/history')
-  @ApiOperation({ summary: 'Obtener el historial de recargas del proveedor' })
-  @ApiParam({ name: 'providerId', description: 'ID del proveedor' })
-  getTopUpHistory(@Param('providerId') providerId: string) {
-    return `Historial de recargas del proveedor ${providerId}`;
+  @Post('update-balance/:providerId')
+  @ApiOperation({ summary: 'Actualizar saldo del proveedor' })
+  async updateProviderBalance(
+    @Param('providerId') providerId: string, 
+    @Body('amount') amount: number
+  ): Promise<void> {
+    await this.providerTopUpService.updateProviderBalance(providerId, amount);
   }
 }

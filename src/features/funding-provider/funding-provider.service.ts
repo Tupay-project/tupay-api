@@ -2,7 +2,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ApiKeyService } from '../api-key/api-key.service';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateProviderDto } from './dto/CreateProviderDto';
 import { FundingProvider } from './entities/provider.entity';
@@ -13,23 +12,26 @@ import { JwtService } from '@nestjs/jwt';
 import { AddFundsDto } from './dto/AddFundsDto';
 import { Transaction } from '../manager/entities/transaction.entity';
 import { HttpService } from '@nestjs/axios';
+import Stripe from 'stripe'; // Importamos Stripe
+import { envs } from 'src/shared/config';
+import { AddProviderFundsDto } from './dto/AddProviderFundsDto';
 
 @Injectable()
 export class FundingProviderService {
+  private stripe: Stripe;
+
   constructor(
     @InjectRepository(FundingProvider)
     private readonly providerRepository: Repository<FundingProvider>,
-
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
-
     private readonly jwtService: JwtService,
-    private readonly httpService: HttpService,  
-
-  ) {}
+    private readonly httpService: HttpService,
+  ) {
+    this.stripe = new Stripe(envs.STRIPE_SECRET_KEY);
+  }
 
   async createProvider(
     createProviderDto: CreateProviderDto,
@@ -191,32 +193,6 @@ export class FundingProviderService {
     return paymentLink;
   }
   
-  
-  
-  // async sendToExternalApi(transaction: Transaction): Promise<string> {
-  //   const externalApiUrl = 'https://api.trytoku.com/transfer'; // Verifica si esta URL es correcta
-  
-  //   const payload = {
-  //     accountNumber: transaction.provider.accountNumber,  
-  //     amount: transaction.amount,  
-  //     reference: transaction.paymentReference,  
-  //     callbackUrl: 'https://api.tupay.finance/webhook/transaction-status',  // Verifica que esta URL sea válida
-  //   };
-  
-  //   try {
-  //     const response = await this.httpService.post(externalApiUrl, payload).toPromise();
-      
-  //     if (response.status !== 200) {
-  //       throw new Error('Error al enviar la solicitud a la API externa');
-  //     }
-  
-  //     const paymentLink = response.data.paymentLink;
-  //     return paymentLink;
-  //   } catch (error) {
-  //     console.error('Error en la solicitud externa:', error.message);
-  //     throw new HttpException('Error en la solicitud de la transferencia', HttpStatus.BAD_REQUEST);
-  //   }
-  // }
 
   async sendToExternalApi(transaction: Transaction): Promise<string> {
     // Simulación de una respuesta exitosa de la API externa de prueba
@@ -227,7 +203,9 @@ export class FundingProviderService {
   
     return paymentLink;  // Devuelve un link simulado de pago
   }
+
   
+
   
   
   

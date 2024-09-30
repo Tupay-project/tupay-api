@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { User } from 'src/features/user/entities/user.entity';
 import { Transaction } from 'src/features/manager/entities/transaction.entity';
+import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
 
 @Entity('loans')
 export class Loan {
@@ -15,6 +16,9 @@ export class Loan {
 
   @Column('decimal', { precision: 10, scale: 2 })
   outstandingBalance: number; // El saldo pendiente del préstamo (cantidad que debe pagarse)
+  
+  @ManyToOne(() => FundingProvider, provider => provider.loans) // Relación con el proveedor
+  provider: FundingProvider; // El proveedor que ofrece el préstamo
 
   @Column('decimal', { precision: 5, scale: 2, default: 0 })
   interestRate: number; // El interés aplicado al préstamo

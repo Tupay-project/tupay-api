@@ -26,4 +26,9 @@ export class ProcessPaymentDto {
   @IsString()
   @IsNotEmpty()
   reference: string;  // Referencia única de la transacción
+
+  @ApiProperty({ description: 'El ID del usuario que realiza el pago' })
+  @IsNotEmpty()
+  @IsString()
+  userId: string; 
 }

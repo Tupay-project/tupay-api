@@ -8,13 +8,12 @@ import { WebhookService } from '../manager/services/webhook.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Payment } from '../manager/entities/payment.entity'; // Importa la entidad Payment
 import { HttpModule } from '@nestjs/axios';
-import { WebhookController } from './controllers/WebhookController';
 import { InvoiceControllerPayment } from './controllers/InvoiceController';
 
 @Module({
   controllers: [
     PaymentController,
-    WebhookController,
+    // WebhookController,
     InvoiceControllerPayment
   ],
   providers: [PaymentService, InvoiceService, TransactionService, WebhookService],

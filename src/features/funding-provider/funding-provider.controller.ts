@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Controller, Post, Headers,Body, Get, HttpException, HttpStatus, UseGuards, Req, Patch } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { FundingProviderService } from './funding-provider.service';
@@ -6,7 +7,6 @@ import { CreateProviderDto } from './dto/CreateProviderDto';
 import { ApiKeyGuard } from './guard/api-key.guard';
 import { LoginProviderDto } from './dto/LoginProviderDto';
 import { UpdateProviderDto } from './dto/UpdateProviderDto';
-import { WebhookServiceTransfeProviders } from './services/webkook-transfe_provider.service';
 import { AddFundsDto } from './dto/AddFundsDto';
 
 
@@ -15,7 +15,6 @@ import { AddFundsDto } from './dto/AddFundsDto';
 export class FundingProviderController {
   constructor(
     private readonly fundingProviderService: FundingProviderService,
-    private readonly webhookService: WebhookServiceTransfeProviders
   ) {}
 
 
@@ -85,38 +84,11 @@ export class FundingProviderController {
     return { message: 'Access granted to provider info' };
   }
 
-  @Post('transaction-status')
-  async updateTransactionStatus(@Body() webhookPayload: any) {
-    try {
-      await this.webhookService.handleTransactionStatus(webhookPayload);
-      return { message: 'Transaction status updated' };
-    } catch (error) {
-      throw new HttpException('Failed to update transaction status', HttpStatus.BAD_REQUEST);
-    }
-  }
 
-  // @Post('add-funds')
-  // @UseGuards(ApiKeyGuard)  // Aplica el ApiKeyGuard a esta ruta
-  // async addFunds(
-  //   @Headers('accesskey') accessKey: string,
-  //   @Headers('privatekey') privateKey: string,
-  //   @Body() addFundsDto: AddFundsDto
-  // ): Promise<{ message: string }> {
-  //   try {
-  //     console.log('AccessKey en controlador:', accessKey);
-  //     console.log('PrivateKey en controlador:', privateKey);
 
-  //     await this.fundingProviderService.addFunds(accessKey, privateKey, addFundsDto);
-  //     return { message: 'Fondos agregados exitosamente' };
-  //   } catch (error) {
-  //     console.error('Error al agregar fondos:', error);
-  //     throw new HttpException(`Error al agregar fondos: ${error.message}`, HttpStatus.BAD_REQUEST);
-  //   }
-  // }
-
-  @Post('add-funds')
-@UseGuards(ApiKeyGuard)  // Aplica el ApiKeyGuard a esta ruta
-async addFunds(
+@Post('add-funds-stripe')
+@UseGuards(ApiKeyGuard) 
+async addFundsForStripe(
   @Headers('accesskey') accessKey: string,
   @Headers('privatekey') privateKey: string,
   @Body() addFundsDto: AddFundsDto
@@ -138,6 +110,9 @@ async addFunds(
     throw new HttpException(`Error al agregar fondos: ${error.message}`, HttpStatus.BAD_REQUEST);
   }
 }
+
+
+
 
 
 

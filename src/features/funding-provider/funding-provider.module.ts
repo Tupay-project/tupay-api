@@ -6,12 +6,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { envs } from 'src/shared/config';
 import { HttpModule } from '@nestjs/axios';
-import { WebhookControllerTransfeProvider } from './controllers/webhook.controller';
-import { WebhookServiceTransfeProviders } from './services/webkook-transfe_provider.service';
+import { ProviderTopUpService } from './services/ProviderTopUpService';
+import { ConfigService } from '@nestjs/config';
+import { ProviderTopUpController } from './controllers/TopUpController';
 
 @Module({
-  controllers: [FundingProviderController,WebhookControllerTransfeProvider],
-  providers: [FundingProviderService,WebhookServiceTransfeProviders],
+  controllers: [FundingProviderController,ProviderTopUpController],
+  providers: [FundingProviderService,ProviderTopUpService,ConfigService],
   imports:[ApiKeyModule,  
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({

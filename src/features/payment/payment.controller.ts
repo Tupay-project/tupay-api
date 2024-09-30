@@ -9,35 +9,38 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
-  // @Post('pay/:invoiceId')
-  // @ApiOperation({ summary: 'Procesar un pago para una factura pendiente' })
-  // @ApiParam({ name: 'invoiceId', description: 'ID de la factura a pagar' })
-  // @ApiResponse({ status: 200, description: 'Pago procesado con éxito' })
-  // @ApiResponse({ status: 400, description: 'El monto del pago no coincide con el monto de la factura' })
-  // @ApiResponse({ status: 500, description: 'Error interno en el servidor' })
-  // async processPayment(
-  //   @Param('invoiceId') invoiceId: string, 
-  //   @Body() paymentData: ProcessPaymentDto
-  // ): Promise<any> {
-  //   try {
-  //     console.log('Iniciando procesamiento del pago para la factura:', invoiceId);
-  //     const invoice = await this.paymentService.processPayment(invoiceId, paymentData);
-  //     console.log('Pago procesado con éxito para la factura ID:', invoiceId);
-  //     return {
-  //       message: 'Pago procesado con éxito',
-  //       invoice,
-  //     };
-  //   } catch (error) {
-  //     console.error('Error procesando el pago:', error.message);
-  //     throw new HttpException(error.message || 'Error al procesar el pago', error.status || HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-  // }
+
 
   @Post('create-payment-session')
-  createtePaymentSession(){
-    return  'create-payment-session'
-    // return this.paymentService.createPaymentSession()
+  createtePaymentSession(processPaymentDto:ProcessPaymentDto){
+    // return  'create-payment-session'
+    return this.paymentService.createPaymentSession(processPaymentDto)
   }
+
+  @Post('pay/:loanId')
+  @ApiOperation({ summary: 'Procesar un pago para un préstamo' })
+  @ApiParam({ name: 'loanId', description: 'ID del préstamo a pagar' })
+  @ApiResponse({ status: 200, description: 'Pago procesado con éxito' })
+  @ApiResponse({ status: 400, description: 'El monto del pago no coincide con el saldo del préstamo' })
+  @ApiResponse({ status: 500, description: 'Error interno en el servidor' })
+  async processLoanPayment(
+    @Param('loanId') loanId: string, 
+    @Body() paymentData: ProcessPaymentDto
+  ): Promise<any> {
+    try {
+      console.log('Iniciando procesamiento del pago para el préstamo:', loanId);
+      const session = await this.paymentService.createLoanPaymentSession(loanId, paymentData);
+      console.log('Sesión de pago creada con éxito para el préstamo ID:', loanId);
+      return {
+        message: 'Sesión de pago creada exitosamente. Completa el pago en el siguiente enlace.',
+        paymentLink: session.url,
+      };
+    } catch (error) {
+      console.error('Error procesando el pago:', error.message);
+      throw new HttpException(error.message || 'Error al procesar el pago', error.status || HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 
 
   @Post('pay/:invoiceId')

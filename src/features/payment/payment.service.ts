@@ -95,6 +95,94 @@ export class PaymentService {
     return payment;
   }
 
+  async createPaymentSession(processPaymentDto: ProcessPaymentDto): Promise<Stripe.Checkout.Session> {
+    // Crear la sesión de pago en Stripe
+    const session = await this.stripe.checkout.sessions.create({
+      payment_method_types: ['card'], // Especificar métodos de pago
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Pago de Préstamo', // Descripción del pago
+            },
+            unit_amount: processPaymentDto.amount * 100, // Convertir el monto a centavos
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment', // Modo de pago
+      success_url: 'http://localhost:5000/api/v1/payments/success', // URL de éxito
+      cancel_url: 'http://localhost:5000/api/v1/payments/cancelled', // URL de cancelación
+      payment_intent_data: {
+        metadata: {
+          method: processPaymentDto.method,  // Método de pago
+          paymentReference: processPaymentDto.paymentReference,  // Referencia de pago
+          providerId: processPaymentDto.providerId,  // ID del proveedor
+          reference: processPaymentDto.reference,  // Referencia de la transacción
+          userId: processPaymentDto.userId,  // ID del usuario
+        },
+      },
+    });
+
+    // Retornar la sesión de pago creada
+    return session;
+  }
+
+  async createLoanPaymentSession(loanId: string, paymentData: ProcessPaymentDto): Promise<any> {
+    const loan = await this.loanRepository.findOne({ where: { id: loanId }, relations: ['provider'] });
+    if (!loan) {
+      throw new HttpException('Loan not found', HttpStatus.NOT_FOUND);
+    }
+  
+    if (loan.status === 'paid') {
+      throw new HttpException('This loan is already paid', HttpStatus.BAD_REQUEST);
+    }
+  
+    // Crear la sesión de pago con Stripe
+    const session = await this.stripe.checkout.sessions.create({
+      payment_intent_data: {
+        metadata: {
+          loanId: loan.id,
+          providerId: loan.provider.id, // Guardamos el ID del proveedor
+          userId: paymentData.userId,
+        },
+      },
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: `Loan Payment for Loan #${loan.id}`,
+            },
+            unit_amount: loan.outstandingBalance * 100, // Convertimos a centavos
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: 'http://localhost:5000/api/v1/webhooks/success',
+      cancel_url: 'http://localhost:5000/api/v1/webhooks/cancelled',
+    });
+  
+    // Registrar la transacción
+    const transaction = this.transactionRepository.create({
+      loan,
+      provider: loan.provider, // Registramos el proveedor
+      amount: paymentData.amount,
+      status: 'pending',
+      paymentReference: session.id,
+    });
+  
+    await this.transactionRepository.save(transaction);
+  
+    return {
+      message: 'Transacción creada exitosamente. Completa el pago en el siguiente enlace.',
+      paymentLink: session.url,
+    };
+  }
+  
+
 
   
 }

@@ -6,7 +6,9 @@ import { envs } from './shared/config';
 // import { WebhookService } from './shared/services/webhook.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule,{
+    rawBody:true
+  });
 
   // Establecer prefijo global para las rutas de la API
   app.setGlobalPrefix('api/v1');
