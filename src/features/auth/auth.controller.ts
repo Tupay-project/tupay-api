@@ -25,9 +25,25 @@ export class AuthController {
 
   @UseGuards(JwtGuard)
   @Get('current-user')
-  currentUser(@Req() req:Request) {
+ async currentUser(@Req() req:Request) {
   
-    console.log('Request',req.user)
+    const user = req.user; // Esto viene del JwtGuard
+    console.log('Request', user);
+
+
+    if (!user) {
+      return { message: 'Usuario no autenticado' };
+    }
+
+    // Llamada al servicio para obtener los detalles del usuario
+    const userDetails = await this.authService.currentUser(user.id);
+    if (!userDetails) {
+      return { message: 'Usuario no encontrado' };
+    }
+
+    return userDetails;
+  
+  
   }
 
   @Post('logout')
