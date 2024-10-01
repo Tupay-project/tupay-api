@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pago de Factura</title>
+</head>
+<body>
+  <h1>Detalles del Pago</h1>
+  <p>Factura ID: {{invoiceId}}</p>  <!-- Mostrando el paymentReference -->
+  <p>Monto: {{amount}} {{currency}}</p>
+  <p>Número de Convenio: {{numberAgreement}}</p> <!-- Mostrar número de convenio -->
+  
+  <form action="/process-payment" method="POST">
+    <input type="hidden" name="invoiceId" value="{{invoiceId}}"> <!-- Enviar paymentReference -->
+    <input type="hidden" name="amount" value="{{amount}}">
+    <input type="hidden" name="numberAgreement" value="{{numberAgreement}}"> <!-- Enviar número de convenio -->
+    <button type="submit">Pagar Ahora</button>
+  </form>
+</body>
+</html>
