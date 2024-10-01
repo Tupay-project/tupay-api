@@ -27,3 +27,7 @@ export class ProcessPaymentDto {
   @IsNotEmpty()
   reference: string;  // Referencia única de la transacción
 }
+
+
+// lista de provedores 
+// 

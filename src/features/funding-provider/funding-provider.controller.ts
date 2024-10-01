@@ -1,5 +1,5 @@
-import { Controller, Post, Headers,Body, Get, HttpException, HttpStatus, UseGuards, Req, Patch } from '@nestjs/common';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Post, Headers,Body, Get, HttpException, HttpStatus, UseGuards, Req, Patch, Param } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { FundingProviderService } from './funding-provider.service';
 import { FundingProvider } from './entities/provider.entity';
 import { CreateProviderDto } from './dto/CreateProviderDto';
@@ -128,6 +128,16 @@ async addFunds(
   }
 }
 
+
+@Get(':providerId/balance')
+@ApiOperation({ summary: 'Obtener el balance de un proveedor' })
+@ApiParam({ name: 'providerId', description: 'ID del proveedor' })
+@ApiResponse({ status: 200, description: 'Balance obtenido con éxito' })
+@ApiResponse({ status: 404, description: 'Proveedor no encontrado' })
+async getProviderBalance(@Param('providerId') providerId: string) {
+  const balance = await this.fundingProviderService.getProviderBalance(providerId);
+  return balance;
+}
 
 
 }

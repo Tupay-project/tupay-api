@@ -25,8 +25,40 @@ export class TransactionService {
   ) {}
 
   // Crear transacción
+  // async createTransaction(createTransactionDto: CreateTransactionDto): Promise<Transaction> {
+  //   const { invoiceId, paymentReference, amount, providerId, status, failureReason } = createTransactionDto;
+
+  //   // Buscar la factura asociada
+  //   const invoice = await this.invoiceRepository.findOne({ where: { id: invoiceId } });
+  //   if (!invoice) {
+  //     throw new HttpException('Factura no encontrada', HttpStatus.NOT_FOUND);
+  //   }
+
+  //   // Verificar si el monto coincide
+  //   if (invoice.amount !== amount) {
+  //     throw new HttpException('El monto del pago no coincide con el monto de la factura', HttpStatus.BAD_REQUEST);
+  //   }
+
+  //   // Buscar el proveedor
+  //   const provider = await this.providerRepository.findOne({ where: { id: providerId } });
+  //   if (!provider) {
+  //     throw new HttpException('Proveedor no encontrado', HttpStatus.NOT_FOUND);
+  //   }
+
+  //   // Crear y guardar la transacción
+  //   const transaction = this.transactionRepository.create({
+  //     invoice,
+  //     paymentReference,
+  //     amount,
+  //     provider,
+  //     status,
+  //     failureReason,
+  //   });
+
+  //   return this.transactionRepository.save(transaction);
+  // }
   async createTransaction(createTransactionDto: CreateTransactionDto): Promise<Transaction> {
-    const { invoiceId, paymentReference, amount, providerId, status, failureReason } = createTransactionDto;
+    const { invoiceId, paymentReference, amount, providerId, status, failureReason, type } = createTransactionDto;
 
     // Buscar la factura asociada
     const invoice = await this.invoiceRepository.findOne({ where: { id: invoiceId } });
@@ -53,6 +85,7 @@ export class TransactionService {
       provider,
       status,
       failureReason,
+      type,  // Aseguramos que el campo 'type' se pase y guarde correctamente
     });
 
     return this.transactionRepository.save(transaction);

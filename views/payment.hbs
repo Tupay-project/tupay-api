@@ -2,6 +2,41 @@
 <html>
 <head>
   <title>Pago de Factura</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    p {
+      font-size: 16px;
+      color: #555;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
 </head>
 <body>
   <h1>Detalles del Pago</h1>
@@ -9,7 +44,7 @@
   <p>Monto: {{amount}} {{currency}}</p>
   <p>Número de Convenio: {{numberAgreement}}</p> <!-- Mostrar número de convenio -->
   
-  <form action="/process-payment" method="POST">
+  <form action="/payments/process-payment" method="POST">
     <input type="hidden" name="invoiceId" value="{{invoiceId}}"> <!-- Enviar paymentReference -->
     <input type="hidden" name="amount" value="{{amount}}">
     <input type="hidden" name="numberAgreement" value="{{numberAgreement}}"> <!-- Enviar número de convenio -->

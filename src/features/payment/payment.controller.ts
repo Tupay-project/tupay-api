@@ -94,12 +94,31 @@ export class PaymentController {
   }
 
 
-  @Post('process-payment')
-processPayment(@Body() paymentData: any) {
-  const { invoiceId, amount } = paymentData;
-  return `Procesando pago de ${amount} para la factura ${invoiceId}`;
-}
 
+  @Post('process-payment/:invoiceId')
+  @ApiOperation({ summary: 'Procesar un pago para una factura' })
+  @ApiParam({ name: 'invoiceId', description: 'ID de la factura a pagar' })
+  @ApiResponse({ status: 200, description: 'Pago procesado con éxito' })
+  @ApiResponse({ status: 400, description: 'El monto del pago no coincide con el monto de la factura' })
+  @ApiResponse({ status: 404, description: 'Factura no encontrada' })
+  @ApiResponse({ status: 500, description: 'Error interno en el servidor' })
+  async processPayment(
+    @Param('invoiceId') invoiceId: string, 
+    @Body() paymentData: ProcessPaymentDto
+  ): Promise<any> {
+    try {
+      console.log('Iniciando procesamiento del pago para la factura:', invoiceId);
+      const result = await this.paymentService.processPayment(invoiceId, paymentData);
+      console.log('Pago procesado con éxito para la factura ID:', invoiceId);
+      return {
+        message: 'Pago procesado con éxito',
+        invoice: result,
+      };
+    } catch (error) {
+      console.error('Error procesando el pago:', error.message);
+      throw new HttpException(error.message || 'Error al procesar el pago', error.status || HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 
   
 }

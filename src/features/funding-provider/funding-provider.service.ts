@@ -225,5 +225,20 @@ export class FundingProviderService {
   }
   
 
+  // balance
+  async getProviderBalance(providerId: string): Promise<{ providerId: string; balance: number }> {
+    const provider = await this.providerRepository.findOne({
+      where: { id: providerId },
+    });
+
+    if (!provider) {
+      throw new NotFoundException('Proveedor no encontrado');
+    }
+
+    return {
+      providerId: provider.id,
+      balance: provider.availableFunds,
+    };
+  }
 
 }

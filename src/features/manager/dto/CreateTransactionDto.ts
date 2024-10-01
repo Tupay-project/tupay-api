@@ -36,4 +36,9 @@ export class CreateTransactionDto {
   paymentMethod:string
   @IsString()
   reference:string
+
+  @ApiProperty({ description: 'Tipo de transacción', example: 'credit' })
+  @IsString()
+  @IsNotEmpty()
+  type: 'credit' | 'debit'; 
 }
