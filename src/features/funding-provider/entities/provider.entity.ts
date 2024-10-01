@@ -1,6 +1,7 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql'; // Importa los decoradores de GraphQL
 import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
 import { Customer } from 'src/features/customer/entities/customer.entity';
+import { Invoice } from 'src/features/invoice/entities/invoice.entity';
 import { Transaction } from 'src/features/manager/entities/transaction.entity';
 import { User } from 'src/features/user/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne } from 'typeorm';
@@ -32,6 +33,8 @@ export class FundingProvider {
   @Field() 
   privateKey: string;
 
+  @ManyToOne(() => Invoice, invoice => invoice.provider)
+  invoices: Invoice;
 
   @Field() 
   @Column({ nullable: true }) // La AccessKey se almacena aquí

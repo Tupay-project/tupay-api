@@ -1,6 +1,13 @@
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin',
+  SUPER_ADMIN = 'superAdmin',
+  MANAGER = 'manager',
+  PROVIDER = 'provider',
+}
+
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
 import { Repository, In } from 'typeorm';
 import { User } from '../user/entities/user.entity';
 import { Permission } from './entities/permission.entity';
@@ -12,13 +19,14 @@ export class RolesService {
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-
     @InjectRepository(Permission)
     private readonly permissionRepository: Repository<Permission>,
   ) {}
 
   // Inicializa los roles y permisos
   async initializeRolesAndPermissions() {
+    console.log('Inicializando roles y permisos...');
+
     const permissionNames = [
       'create_user',
       'edit_user',
@@ -34,37 +42,49 @@ export class RolesService {
       'configure_integrations',
       'view_reports',
 
+      // Nuevos permisos para proveedores de fondos
+      'create_funding_provider',
+      'view_funding_provider',
+      'manage_funding_provider',
 
-    // Nuevos permisos para proveedores de fondos
-    'create_funding_provider',
-    'view_funding_provider',
-    'manage_funding_provider',
+      // Permisos para API Keys
+      'create_api_key',
+      'view_api_key',
+      'revoke_api_key',
+      'rotate_api_key',
 
-    // Permisos para API Keys
-    'create_api_key',
-    'view_api_key',
-    'revoke_api_key',
-    'rotate_api_key',
+      // Permisos para Créditos
+      'request_credit',
+      'approve_credit',
+      'reject_credit',
+      'view_credit',
+      'generate_credit_plan',
+      'manage_credit',
 
-    // Permisos para Créditos
-    'request_credit',
-    'approve_credit',
-    'reject_credit',
-    'view_credit',
-    'generate_credit_plan',
-    'manage_credit',
+      // Permisos para Retiros
+      'create_withdrawal',
+      'view_withdrawal',
+      'confirm_withdrawal',
+      'manage_withdrawal',
 
-    // Permisos para Retiros
-    'create_withdrawal',
-    'view_withdrawal',
-    'confirm_withdrawal',
-    'manage_withdrawal',
+      // Permisos para Facturas (Invoices)
+      'create_invoice',
+      'view_invoice',
+      'pay_invoice',
+      'manage_invoice',
 
-    // Permisos para Facturas (Invoices)
-    'create_invoice',
-    'view_invoice',
-    'pay_invoice',
-    'manage_invoice',
+      // Nuevos permisos específicos del proveedor
+      'view_provider_transactions',
+      'confirm_payment',
+      'view_provider_balance',
+      'manage_provider_payments',
+      'view_provider_invoices',
+      'generate_invoice',
+      'pay_invoice',
+      'configure_webhook',
+      'view_webhook_logs',
+      'manage_provider_integrations',
+      'view_provider_audit_logs',
     ];
 
     // Crea permisos si no existen
@@ -77,10 +97,10 @@ export class RolesService {
     }
 
     // Asigna permisos al rol "superadmin"
-    await this.createRole('superadmin', permissionNames);
+    await this.createRole(UserRole.SUPER_ADMIN, permissionNames);
 
     // Asigna permisos al rol "manager"
-    await this.createRole('manager', permissionNames);
+    await this.createRole(UserRole.MANAGER, permissionNames);
 
     // Asigna permisos al rol "admin"
     const adminPermissions = [
@@ -101,7 +121,7 @@ export class RolesService {
       'create_invoice',
       'view_invoice',
     ];
-    await this.createRole('admin', adminPermissions);
+    await this.createRole(UserRole.ADMIN, adminPermissions);
 
     // Asigna permisos al rol "user"
     const userPermissions = [
@@ -113,7 +133,23 @@ export class RolesService {
       'create_withdrawal',
       'view_invoice',
     ];
-    await this.createRole('user', userPermissions);
+    await this.createRole(UserRole.USER, userPermissions);
+
+    // Asigna permisos al rol "provider"
+    const providerPermissions = [
+      'view_provider_transactions',
+      'confirm_payment',
+      'view_provider_balance',
+      'manage_provider_payments',
+      'view_provider_invoices',
+      'generate_invoice',
+      'pay_invoice',
+      'configure_webhook',
+      'view_webhook_logs',
+      'manage_provider_integrations',
+      'view_provider_audit_logs',
+    ];
+    await this.createRole(UserRole.PROVIDER, providerPermissions);
   }
 
   // Crear un rol con permisos
@@ -152,51 +188,46 @@ export class RolesService {
   }
 
   // Revocar un rol de un usuario
-async revokeRole(userId: string, roleName: string): Promise<void> {
-  const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['roles'] });
-  if (!user) {
-    throw new NotFoundException('User not found');
+  async revokeRole(userId: string, roleName: string): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['roles'] });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const role = await this.roleRepository.findOne({ where: { name: roleName } });
+    if (!role) {
+      throw new NotFoundException('Role not found');
+    }
+
+    // Verificar si el usuario tiene el rol asignado
+    const roleIndex = user.roles.findIndex(existingRole => existingRole.id === role.id);
+    if (roleIndex === -1) {
+      throw new BadRequestException('User does not have this role');
+    }
+
+    user.roles.splice(roleIndex, 1);
+    await this.userRepository.save(user);
   }
 
-  const role = await this.roleRepository.findOne({ where: { name: roleName } });
-  if (!role) {
-    throw new NotFoundException('Role not found');
+  async updateRolePermissions(roleName: string, newPermissions: string[]): Promise<Role> {
+    const role = await this.roleRepository.findOne({ where: { name: roleName }, relations: ['permissions'] });
+    if (!role) {
+      throw new NotFoundException('Role not found');
+    }
+
+    const permissions = await this.permissionRepository.find({
+      where: { name: In(newPermissions) },
+    });
+
+    role.permissions = permissions;
+    return this.roleRepository.save(role);
   }
 
-  // Verificar si el usuario tiene el rol asignado
-  const roleIndex = user.roles.findIndex(existingRole => existingRole.id === role.id);
-  if (roleIndex === -1) {
-    throw new BadRequestException('User does not have this role');
+  async listAllPermissions(): Promise<Permission[]> {
+    return this.permissionRepository.find();
   }
 
-  user.roles.splice(roleIndex, 1);
-  await this.userRepository.save(user);
-}
-
-async updateRolePermissions(roleName: string, newPermissions: string[]): Promise<Role> {
-  const role = await this.roleRepository.findOne({ where: { name: roleName }, relations: ['permissions'] });
-  if (!role) {
-    throw new NotFoundException('Role not found');
+  async listAllRoles(): Promise<Role[]> {
+    return this.roleRepository.find({ relations: ['permissions'] });
   }
-
-  const permissions = await this.permissionRepository.find({
-    where: { name: In(newPermissions) },
-  });
-
-  role.permissions = permissions;
-  return this.roleRepository.save(role);
-}
-
-async listAllPermissions(): Promise<Permission[]> {
-  return this.permissionRepository.find();
-}
-
-async listAllRoles(): Promise<Role[]> {
-  return this.roleRepository.find({ relations: ['permissions'] });
-}
-
-
-
-
-
 }

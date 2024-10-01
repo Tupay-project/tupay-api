@@ -1,4 +1,4 @@
-import { Controller, Post, Headers,Body, Get, HttpException, HttpStatus, UseGuards, Req, Patch, Param } from '@nestjs/common';
+import { Controller, Post, Headers,Body, Get, HttpException, HttpStatus, UseGuards, Req, Patch, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { FundingProviderService } from './funding-provider.service';
 import { FundingProvider } from './entities/provider.entity';
@@ -7,10 +7,15 @@ import { ApiKeyGuard } from './guard/api-key.guard';
 import { LoginProviderDto } from './dto/LoginProviderDto';
 import { UpdateProviderDto } from './dto/UpdateProviderDto';
 import { AddFundsDto } from './dto/AddFundsDto';
+import { InvoiceHistoryDto, TransactionHistoryDto } from './dto/HistoryDto';
+import { RoleGuard } from '../auth/guards/role.guard';
+import { Roles } from 'src/shared/decorators/roles.docorator';
+import { JwtGuard } from '../auth/guards/auth.guard';
 
 
+
+@UseGuards(JwtGuard, RoleGuard)  
 @Controller('funding-provider')
-
 export class FundingProviderController {
   constructor(
     private readonly fundingProviderService: FundingProviderService,
@@ -52,13 +57,32 @@ export class FundingProviderController {
     }
   }
 
+  @Roles('provider') 
   @Get('me')
   @ApiOperation({ summary: 'Obtener detalles de la cuenta del proveedor' })
   async getProviderDetails(@Req() req: any) {
-    const { accessKey, privateKey } = req.headers;
-    const provider = await this.fundingProviderService.getProviderByKeys(accessKey, privateKey);
-    return provider;
+    try {
+      const { accessKey, privateKey } = req.headers;
+      console.log('AccessKey:', accessKey);
+      console.log('PrivateKey:', privateKey);
+  
+      if (!accessKey || !privateKey) {
+        throw new HttpException('Access Key or Private Key missing', HttpStatus.BAD_REQUEST);
+      }
+  
+      const provider = await this.fundingProviderService.getProviderDetails(accessKey, privateKey);
+  
+      if (!provider) {
+        throw new HttpException('Provider not found', HttpStatus.NOT_FOUND);
+      }
+  
+      return provider;
+    } catch (error) {
+      console.error('Error in getProviderDetails:', error.message);
+      throw new HttpException('Internal server error: ' + error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
+  
 
   @Patch('update')
   @ApiOperation({ summary: 'Actualizar la información del proveedor' })
@@ -68,13 +92,21 @@ export class FundingProviderController {
     return updatedProvider;
   }
 
+  //    privateKey = dd5421d1-5a6f-485a-86f8-f489d3e71ee3
+//    accessKey = dd3e8dc3c3-66c1-4834-982e-584aa0e64416
+
+// "privateKey": "dd5421d1-5a6f-485a-86f8-f489d3e71ee3",
+// "accessKey": "3e8dc3c3-66c1-4834-982e-584aa0e64416",
+// token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjkzZjJiN2U2LTJiZTEtNDRiZS1iNjUwLWIxODM2Mzk3YzIxMiIsIm5hbWUiOiJmbG93ZXIiLCJpYXQiOjE3Mjc4MTA1NDcsImV4cCI6MTcyNzg5Njk0N30.lq4FlT1wsnFPkIj8WADbGkTFHfxCG8Gni9XCxBgba84
 
 
   @Get('all')
+  @UseGuards(ApiKeyGuard)  
   @ApiOperation({ summary: 'Obtener todos los proveedores' })
   async getAllProviders(): Promise<FundingProvider[]> {
     return this.fundingProviderService.getAllProviders();
   }
+  
 
   @Get('info')
   @UseGuards(ApiKeyGuard) 
@@ -138,6 +170,58 @@ async getProviderBalance(@Param('providerId') providerId: string) {
   const balance = await this.fundingProviderService.getProviderBalance(providerId);
   return balance;
 }
+
+
+@Get(':providerId/customers')
+@ApiOperation({ summary: 'Obtener los customers asociados a un provider' })
+@ApiParam({ name: 'providerId', description: 'ID del provider' })
+async getCustomersForProvider(@Param('providerId') providerId: string) {
+  const customers = await this.fundingProviderService.getcustomerProviderId(providerId);
+  return customers;
+}
+
+
+@Get(':providerId/transactions')
+@ApiOperation({ summary: 'Obtener las transacciones asociadas a un provider' })
+@ApiParam({ name: 'providerId', description: 'ID del provider' })
+async getTransactionsForProvider(@Param('providerId') providerId: string) {
+  const transactions = await this.fundingProviderService.getTransactionsByProviderId(providerId);
+  return transactions;
+}
+
+@Get(':providerId/transaction-history')
+@ApiOperation({ summary: 'Obtener el historial de transacciones del provider con filtros opcionales' })
+async getTransactionHistory(
+  @Param('providerId') providerId: string,
+  @Query() filters: TransactionHistoryDto,
+) {
+  const transactions = await this.fundingProviderService.getTransactionHistory(providerId, filters);
+  return transactions;
+}
+
+
+
+@Get(':providerId/invoice-history')
+@ApiOperation({ summary: 'Obtener el historial de facturas del provider con filtros opcionales' })
+async getInvoiceHistory(
+  @Param('providerId') providerId: string,
+  @Query() filters: InvoiceHistoryDto,
+) {
+  try {
+    const invoices = await this.fundingProviderService.getInvoiceHistory(providerId, filters);
+    return invoices;
+  } catch (error) {
+    console.error('Error en el controlador al obtener historial de facturas:', error.message);
+    throw new HttpException(
+      `Error al obtener historial de facturas: ${error.message}`,
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+}
+
+
+
+
 
 
 }

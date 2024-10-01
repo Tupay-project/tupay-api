@@ -1,5 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql'; // Importa los decoradores de GraphQL
 import { Customer } from 'src/features/customer/entities/customer.entity';
+import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
 import { Transaction } from 'src/features/manager/entities/transaction.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 
@@ -13,6 +14,9 @@ export class Invoice {
   @ManyToOne(() => Customer, (customer) => customer.invoices, { eager: true })
   @Field(() => Customer) 
   customer: Customer;
+
+  @ManyToOne(() => FundingProvider, provider => provider.invoices)
+  provider: FundingProvider;
 
   @Column('decimal', {
     precision: 10,
