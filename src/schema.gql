@@ -2,6 +2,25 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Transaction {
+  id: ID!
+  invoice: Invoice!
+  provider: FundingProvider!
+  amount: Float!
+  paymentReference: String!
+  status: String!
+  createdAt: DateTime!
+  failureReason: String
+  paymentMethod: String!
+  type: String
+  metadata: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Invoice {
   id: ID!
   customer: Customer!
@@ -16,25 +35,6 @@ type Invoice {
   paymentLink: String!
   createdAt: DateTime!
   updatedAt: DateTime!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-type Transaction {
-  id: ID!
-  invoice: Invoice!
-  provider: FundingProvider!
-  amount: Float!
-  paymentReference: String!
-  status: String!
-  createdAt: DateTime!
-  failureReason: String
-  paymentMethod: String!
-  type: String
-  metadata: String
 }
 
 type FundingProvider {
@@ -87,8 +87,12 @@ type User {
   profilePicture: String
   status: String!
   customer: Customer!
+  createdBy: User
+  createdUsers: [User!]
   createdAt: DateTime!
   updatedAt: DateTime!
+  webhookUrl: String
+  availableFunds: Float!
 }
 
 type Payment {

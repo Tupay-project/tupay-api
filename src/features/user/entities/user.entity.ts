@@ -1,11 +1,11 @@
-import { ObjectType, Field, ID } from '@nestjs/graphql'; // Importa los decoradores de GraphQL
+import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { Customer } from 'src/features/customer/entities/customer.entity';
 import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
 import { Loan } from 'src/features/loan/entities/loan.entity';
 import { Role } from 'src/features/role/entities/roles.entity';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne, ManyToMany, JoinTable, OneToMany, ManyToOne } from 'typeorm';
 
-@ObjectType() // Decorador para GraphQL
+@ObjectType()
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -18,7 +18,7 @@ export class User {
 
   @Column({ nullable: true })
   @Field({ nullable: true })
-  password: string
+  password: string;
 
   @Column({ unique: true })
   @Field()
@@ -39,11 +39,12 @@ export class User {
 
   @Column({ unique: true, length: 20, nullable: true })
   @Field({ nullable: true })
-
   accountNumber: string;
+
   @Column({ nullable: true })
   @Field({ nullable: true })
-  profilePicture: string
+  profilePicture: string;
+
   @Column({ default: 'active' })
   @Field()
   status: string;
@@ -57,8 +58,17 @@ export class User {
   loans: Loan;
 
   @OneToMany(() => FundingProvider, provider => provider.createdBy)
-  providers: FundingProvider[];  // Un usuario puede crear varios proveedores
+  providers: FundingProvider[];
 
+  // Relación para indicar quién creó este usuario
+  @ManyToOne(() => User, user => user.createdUsers)
+  @JoinColumn({ name: 'created_by' })
+  @Field(() => User, { nullable: true })
+  createdBy: User;
+
+  @OneToMany(() => User, user => user.createdBy)
+  @Field(() => [User], { nullable: true })
+  createdUsers: User[];
 
   @CreateDateColumn()
   @Field()
@@ -67,4 +77,21 @@ export class User {
   @UpdateDateColumn()
   @Field()
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  privateKey?: string;
+
+  @Column({ nullable: true })
+  accessKey?: string;
+
+
+  @Column({ nullable: true })
+  @Field({ nullable: true }) // Puede ser nulo en GraphQL
+  webhookUrl: string;
+
+
+
+  @Column({ type: 'decimal', default: 0, nullable: false })
+  @Field() 
+  availableFunds: number;
 }

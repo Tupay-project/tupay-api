@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApiKeyService } from '../api-key/api-key.service';
@@ -13,7 +13,14 @@ import { JwtService } from '@nestjs/jwt';
 import { AddFundsDto } from './dto/AddFundsDto';
 import { Transaction } from '../manager/entities/transaction.entity';
 import { HttpService } from '@nestjs/axios';
+import { Customer } from '../customer/entities/customer.entity';
+import { InvoiceHistoryDto, TransactionHistoryDto } from './dto/HistoryDto';
+import { Invoice } from '../invoice/entities/invoice.entity';
+import { JwtGuard } from '../auth/guards/auth.guard';
+import { RoleGuard } from '../auth/guards/role.guard';
 
+
+@UseGuards(JwtGuard, RoleGuard)  
 @Injectable()
 export class FundingProviderService {
   constructor(
@@ -22,9 +29,15 @@ export class FundingProviderService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Customer)
+    private readonly customerRepository: Repository<Customer>,
 
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
+
+    
+    @InjectRepository(Invoice)
+    private readonly invoiceRepository: Repository<Invoice>,
 
     private readonly jwtService: JwtService,
     private readonly httpService: HttpService,  
@@ -76,39 +89,40 @@ export class FundingProviderService {
   }
   //
 
-  async authenticateProvider(
-    loginProviderDto: LoginProviderDto,
-  ): Promise<{ token: string; provider: FundingProvider }> {
-    const { accessKey, privateKey } = loginProviderDto;
+  // async authenticateProvider(
+  //   loginProviderDto: LoginProviderDto,
+  // ): Promise<{ token: string; provider: FundingProvider }> {
+  //   const { accessKey, privateKey } = loginProviderDto;
 
-    // Buscar el proveedor en la entidad FundingProvider usando accessKey y privateKey
-    const provider = await this.providerRepository.findOne({
-      where: { accessKey, privateKey },
-    });
+  //   // Buscar el proveedor en la entidad FundingProvider usando accessKey y privateKey
+  //   const provider = await this.providerRepository.findOne({
+  //     where: { accessKey, privateKey },
+  //   });
 
-    if (!provider) {
-      throw new HttpException(
-        'Credenciales inválidas',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+  //   if (!provider) {
+  //     throw new HttpException(
+  //       'Credenciales inválidas',
+  //       HttpStatus.UNAUTHORIZED,
+  //     );
+  //   }
 
-    // Preparar el payload para el token
-    const payload = { id: provider.id, name: provider.name };
+  //   // Preparar el payload para el token
+  //   const payload = { id: provider.id, name: provider.name };
 
-    // Generar el token JWT
-    const token = this.jwtService.sign(payload);
+  //   // Generar el token JWT
+  //   const token = this.jwtService.sign(payload);
 
-    // Excluir las claves de la respuesta
-    delete provider.privateKey;
-    delete provider.accessKey;
+  //   // Excluir las claves de la respuesta
+  //   delete provider.privateKey;
+  //   delete provider.accessKey;
 
-    // Devolver el token y la información del proveedor
-    return {
-      token,
-      provider,
-    };
-  }
+  //   // Devolver el token y la información del proveedor
+  //   return {
+  //     token,
+  //     provider,
+  //   };
+  // }
+
 
   async getProviderById(id: string): Promise<FundingProvider> {
     const provider = await this.providerRepository.findOne({ where: { id } });
@@ -120,31 +134,101 @@ export class FundingProviderService {
     return provider;
   }
 
-  async getAllProviders(): Promise<FundingProvider[]> {
-    return this.providerRepository.find();
+  async getCustomersByProviderId(providerId: string): Promise<Customer[]> {
+    // Buscar el usuario que tiene el rol de 'provider' y el ID del proveedor
+    const providerUser = await this.userRepository.findOne({
+      where: { id: providerId },
+      relations: ['roles', 'customer'], // Relación con roles y customer
+    });
+  
+    if (!providerUser) {
+      throw new NotFoundException('Proveedor no encontrado');
+    }
+  
+    // Verificar si el usuario tiene el rol de 'provider'
+    const isProvider = providerUser.roles.some((role) => role.name === 'provider');
+    
+    if (!isProvider) {
+      throw new NotFoundException('El usuario no tiene el rol de proveedor');
+    }
+  
+    // Retornar los clientes asociados a este proveedor (usuario)
+    const customers = providerUser.customer ? [providerUser.customer] : [];
+  
+    return customers;
   }
+  
+  async getAllProviders(): Promise<User[]> {
+    // Filtrar los usuarios que tienen el rol de 'provider'
+    return this.userRepository.find({
+      where: {
+        roles: { name: 'provider' },  // Filtrar usuarios cuyo rol sea 'provider'
+      },
+      relations: ['roles'],  // Asegurarnos de cargar los roles junto con los usuarios
+    });
+  }
+  
 
   //
-
-  async getProviderByKeys(accessKey: string, privateKey: string): Promise<FundingProvider | null> {
+  async getProviderDetails(accessKey: string, privateKey: string) {
     console.log('AccessKey recibida en el servicio:', accessKey);
     console.log('PrivateKey recibida en el servicio:', privateKey);
-  
+    if (!accessKey || !privateKey) {
+      throw new HttpException('Access Key or Private Key missing', HttpStatus.BAD_REQUEST);
+    }
+
+    // Buscar el proveedor en la base de datos
     const provider = await this.providerRepository.findOne({
       where: { accessKey, privateKey },
     });
-  
+
     if (!provider) {
-      console.log('Proveedor no encontrado en la base de datos con las claves proporcionadas.');
+      throw new HttpException('Provider not found', HttpStatus.NOT_FOUND);
+    }
+
+    return provider;
+  }
+
+  // async getProviderByKeys(accessKey: string, privateKey: string): Promise<FundingProvider | null> {
+  //   console.log('AccessKey recibida en el servicio:', accessKey);
+  //   console.log('PrivateKey recibida en el servicio:', privateKey);
+  
+  //   const provider = await this.providerRepository.findOne({
+  //     where: { accessKey, privateKey },
+  //   });
+  
+  //   if (!provider) {
+  //     console.log('Proveedor no encontrado en la base de datos con las claves proporcionadas.');
+  //     return null;
+  //   }
+  
+  //   // Excluir las claves de la respuesta
+  //   delete provider.privateKey;
+  //   delete provider.accessKey;
+  
+  //   return provider;
+  // }
+
+  async getProviderByKeys(accessKey: string, privateKey: string): Promise<User | null> {
+    console.log('AccessKey recibida en el servicio:', accessKey);
+    console.log('PrivateKey recibida en el servicio:', privateKey);
+  
+    const user = await this.userRepository.findOne({
+      where: { accessKey, privateKey },  // Busca en la entidad User
+    });
+  
+    if (!user) {
+      console.log('Usuario no encontrado en la base de datos con las claves proporcionadas.');
       return null;
     }
   
     // Excluir las claves de la respuesta
-    delete provider.privateKey;
-    delete provider.accessKey;
+    delete user.privateKey;
+    delete user.accessKey;
   
-    return provider;
+    return user;
   }
+  
   
   async updateProviderInfo(
     updateProviderDto: UpdateProviderDto,
@@ -240,5 +324,96 @@ export class FundingProviderService {
       balance: provider.availableFunds,
     };
   }
+  async getcustomerProviderId(providerId:string):Promise<Customer[]>{
+    const provider  = await this.providerRepository.findOne({
+      where:{id:providerId},
+      relations:['customers']
+    })
+    if (!provider){
+      throw new NotFoundException('Proveedor no encontrado');
+    }
+
+    return provider.customers;
+
+  }
+
+  async getTransactionsByProviderId(providerId: string): Promise<Transaction[]> {
+    const provider = await this.providerRepository.findOne({
+      where: { id: providerId },
+      relations: ['transactions'],  
+    });
+  
+    if (!provider) {
+      throw new NotFoundException('Proveedor no encontrado');
+    }
+  
+    return provider.transactions;
+  }
+
+  async getTransactionHistory(
+    providerId: string,
+    filters: TransactionHistoryDto,
+  ): Promise<Transaction[]> {
+    const query = this.transactionRepository.createQueryBuilder('transaction')
+      .where('transaction.providerId = :providerId', { providerId });
+  
+    if (filters.startDate) {
+      query.andWhere('transaction.createdAt >= :startDate', { startDate: filters.startDate });
+    }
+  
+    if (filters.endDate) {
+      query.andWhere('transaction.createdAt <= :endDate', { endDate: filters.endDate });
+    }
+  
+    if (filters.type) {
+      query.andWhere('transaction.type = :type', { type: filters.type });
+    }
+  
+    if (filters.status) {
+      query.andWhere('transaction.status = :status', { status: filters.status });
+    }
+  
+    const transactions = await query.getMany();
+    return transactions;
+  }
+
+  // 
+  async getInvoiceHistory(
+    providerId: string,
+    filters: InvoiceHistoryDto,
+  ): Promise<Invoice[]> {
+    try {
+      const query = this.invoiceRepository.createQueryBuilder('invoice')
+        .where('invoice.providerId = :providerId', { providerId });
+  
+      if (filters.startDate) {
+        query.andWhere('invoice.createdAt >= :startDate', { startDate: filters.startDate });
+      }
+  
+      if (filters.endDate) {
+        query.andWhere('invoice.createdAt <= :endDate', { endDate: filters.endDate });
+      }
+  
+      if (filters.status) {
+        query.andWhere('invoice.status = :status', { status: filters.status });
+      }
+  
+      if (filters.numberAgreement) {
+        query.andWhere('invoice.numberAgreement LIKE :numberAgreement', { numberAgreement: `%${filters.numberAgreement}%` });
+      }
+  
+      const invoices = await query.getMany();
+      return invoices;
+    } catch (error) {
+      console.error('Error al obtener el historial de facturas:', error.message);
+      throw new HttpException(
+        `Error interno al obtener el historial de facturas: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  
+  
+  
 
 }

@@ -33,7 +33,7 @@ export class Customer {
 
   @OneToOne(() => User, (user) => user.customer) // Relación uno a uno con User
   @Field(() => User) // Relación uno a uno en GraphQL
-  user: User;
+  user?: User;
 
   @ManyToOne(() => FundingProvider, (provider) => provider.customers, { eager: true })
   @Field(() => FundingProvider) // Relación con FundingProvider en GraphQL

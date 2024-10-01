@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { FundingProvider } from '../funding-provider/entities/provider.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class CustomerService {
@@ -13,35 +14,47 @@ export class CustomerService {
         @InjectRepository(Customer)
         private customersRepository: Repository<Customer>,
 
+        @InjectRepository(User) // Inyectamos el repositorio de User
+        private readonly userRepository: Repository<User>,
+
 
     @InjectRepository(FundingProvider)
     private readonly providerRepository: Repository<FundingProvider>,
     ) { }
-    async createCustomer(createCustomerDto: CreateCustomerDto): Promise<Omit<Customer, 'provider'>> {
-        const provider = await this.providerRepository.findOne({ where: { id: createCustomerDto.providerId } });
-        
-        if (!provider) {
-          throw new Error('Provider not found');
-        }
-      
-        // Crear el cliente con el proveedor
-        const customer = this.customersRepository.create({
-          ...createCustomerDto,
-          provider, 
+
+    async createCustomer(createCustomerDto: CreateCustomerDto, userId: string): Promise<Omit<Customer, 'user'>> {
+        // Buscar el usuario (provider) que está creando el cliente
+        const user = await this.userRepository.findOne({
+            where: { id: userId },
+            relations: ['roles'],
         });
-      
+    
+        if (!user) {
+            throw new NotFoundException('Usuario no encontrado');
+        }
+    
+        // Verificar si el usuario tiene el rol de 'provider'
+        const isProvider = user.roles.some(role => role.name === 'provider');
+        if (!isProvider) {
+            throw new ConflictException('El usuario no tiene el rol de proveedor');
+        }
+    
+        // Crear el cliente con el usuario que lo creó (sin buscar un "provider" adicional)
+        const customer = this.customersRepository.create({
+            ...createCustomerDto,
+            user,  // Asociamos el user que creó el customer
+        });
+    
         // Guardar el cliente en la base de datos
         const savedCustomer = await this.customersRepository.save(customer);
+    
+        // Excluir el campo user de la respuesta antes de devolverla
+        const { user: _, ...customerWithoutUser } = savedCustomer;
+    
+        return customerWithoutUser;
+    }
+    
       
-        // Eliminar el campo provider de la respuesta antes de devolverla
-        const { provider: _, ...customerWithoutProvider } = savedCustomer;
-      
-        return customerWithoutProvider;
-      }
-      
-      
-
-    // Método para obtener un cliente por ID
     async getCustomerById(id: string): Promise<Customer> {
         const customer = await this.customersRepository.findOne({ where: { id } });
         if (!customer) {
