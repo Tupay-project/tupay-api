@@ -17,7 +17,7 @@ export class RoleGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const { roles } = req.user;
      // Asegurarse de que req.user existe y tiene los roles
-    // console.log('_____ROLES___DATA', req.user);
+    console.log('_____ROLES___DATA', req.user);
     // console.log('_____ROLES___', roles);
 
     // Verificar si el usuario tiene al menos uno de los roles requeridos

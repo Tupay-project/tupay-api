@@ -29,6 +29,8 @@ export class FundingProviderService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Customer)
+    private readonly customerRepository: Repository<Customer>,
 
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
@@ -120,35 +122,7 @@ export class FundingProviderService {
   //     provider,
   //   };
   // }
-  async authenticateProvider(
-    loginProviderDto: LoginProviderDto,
-  ): Promise<{ token: string; provider: FundingProvider }> {
-    const { accessKey, privateKey } = loginProviderDto;
-  
-    // Buscar el proveedor en la entidad FundingProvider usando accessKey y privateKey
-    const provider = await this.providerRepository.findOne({
-      where: { accessKey, privateKey },
-    });
-  
-    if (!provider) {
-      throw new HttpException('Credenciales inválidas', HttpStatus.UNAUTHORIZED);
-    }
-  
-    // Aquí incluimos el rol de 'provider' en el payload
-    const payload = { id: provider.id, name: provider.name, roles: ['provider'] };
-  
-    const token = this.jwtService.sign(payload);
-  
-    // Excluir las claves de la respuesta
-    delete provider.privateKey;
-    delete provider.accessKey;
-  
-    return {
-      token,
-      provider,
-    };
-  }
-  
+
 
   async getProviderById(id: string): Promise<FundingProvider> {
     const provider = await this.providerRepository.findOne({ where: { id } });
@@ -160,9 +134,40 @@ export class FundingProviderService {
     return provider;
   }
 
-  async getAllProviders(): Promise<FundingProvider[]> {
-    return this.providerRepository.find();
+  async getCustomersByProviderId(providerId: string): Promise<Customer[]> {
+    // Buscar el usuario que tiene el rol de 'provider' y el ID del proveedor
+    const providerUser = await this.userRepository.findOne({
+      where: { id: providerId },
+      relations: ['roles', 'customer'], // Relación con roles y customer
+    });
+  
+    if (!providerUser) {
+      throw new NotFoundException('Proveedor no encontrado');
+    }
+  
+    // Verificar si el usuario tiene el rol de 'provider'
+    const isProvider = providerUser.roles.some((role) => role.name === 'provider');
+    
+    if (!isProvider) {
+      throw new NotFoundException('El usuario no tiene el rol de proveedor');
+    }
+  
+    // Retornar los clientes asociados a este proveedor (usuario)
+    const customers = providerUser.customer ? [providerUser.customer] : [];
+  
+    return customers;
   }
+  
+  async getAllProviders(): Promise<User[]> {
+    // Filtrar los usuarios que tienen el rol de 'provider'
+    return this.userRepository.find({
+      where: {
+        roles: { name: 'provider' },  // Filtrar usuarios cuyo rol sea 'provider'
+      },
+      relations: ['roles'],  // Asegurarnos de cargar los roles junto con los usuarios
+    });
+  }
+  
 
   //
   async getProviderDetails(accessKey: string, privateKey: string) {

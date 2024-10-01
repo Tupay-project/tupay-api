@@ -92,7 +92,7 @@ type User {
   createdAt: DateTime!
   updatedAt: DateTime!
   webhookUrl: String
-  availableFunds: Float
+  availableFunds: Float!
 }
 
 type Payment {

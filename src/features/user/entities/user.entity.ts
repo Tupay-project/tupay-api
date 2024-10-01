@@ -90,8 +90,8 @@ export class User {
   webhookUrl: string;
 
 
-  
-  @Column({ nullable: true })
-  @Field({ nullable: true })
+
+  @Column({ type: 'decimal', default: 0, nullable: false })
+  @Field() 
   availableFunds: number;
 }

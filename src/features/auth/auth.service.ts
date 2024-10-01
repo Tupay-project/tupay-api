@@ -67,51 +67,7 @@ export class AuthService {
       }
     }
     
-    // Método para registrar un nuevo usuario
-    // public async registerUserWithRole(
-    //   userBody: AuthRegisterDto,
-    //   roleName: UserRole,
-    //   createdBy: { id: string; name: string; email: string; roles: any } // Adaptar al tipo simplificado
-    // ): Promise<User> {
-    //   console.log('Registro de usuario - Datos recibidos:', userBody);
-    
-    //   // Verificar si el email ya existe
-    //   const existingUser = await this.userRepository.findOne({ where: { email: userBody.email } });
-    //   if (existingUser) {
-    //     console.log('Email ya registrado:', userBody.email);
-    //     throw new BadRequestException('El email ya está en uso.');
-    //   }
-    
-    //   try {
-    //     // Encriptar la contraseña
-    //     const hashedPassword = await generateHash(userBody.password);
-    //     console.log('Contraseña encriptada:', hashedPassword);
-    
-    //     // Verifica si el rol existe, si no, lo crea
-    //     let role = await this.roleRepository.findOne({ where: { name: roleName } });
-    //     if (!role) {
-    //       console.log(`Rol ${roleName} no encontrado, creando uno nuevo.`);
-    //       role = this.roleRepository.create({ name: roleName });
-    //       await this.roleRepository.save(role);
-    //     }
-    
-    //     // Crear nuevo usuario con la contraseña encriptada y asignar el rol, sin requerir todas las propiedades de User.
-    //     const newUser = this.userRepository.create({
-    //       ...userBody,
-    //       password: hashedPassword,
-    //       roles: [role],
-    //       createdBy: { id: createdBy.id, name: createdBy.name, email: createdBy.email }, // Solo guardamos las propiedades relevantes
-    //     });
-    
-    //     const savedUser = await this.userRepository.save(newUser);
-    //     console.log('Usuario guardado en la base de datos:', savedUser);
-    
-    //     return savedUser;
-    //   } catch (error) {
-    //     console.error('Error en registerUserWithRole:', error);
-    //     throw new HttpException('Error al registrar usuario', HttpStatus.INTERNAL_SERVER_ERROR);
-    //   }
-    // }
+ 
 
     public async registerUserWithRole(
       userBody: AuthRegisterDto,
@@ -238,13 +194,6 @@ export class AuthService {
     
 
 
-    // async currentUser(userId: string): Promise<User> {
-    //   // Asegurarte de cargar los roles junto con el usuario
-    //   return this.userRepository.findOne({
-    //     where: { id: userId },
-    //     relations: ['roles'],  
-    //   });
-    // }
 
     async currentUser(userId: string): Promise<User> {
       // Cargar el usuario junto con sus roles y las claves accessKey y privateKey

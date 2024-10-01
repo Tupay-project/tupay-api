@@ -1,30 +1,37 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, SetMetadata, UseGuards } from '@nestjs/common';
+import { Body, ConflictException, Controller, Delete, Get, Param, Post, Put, Req, SetMetadata, UseGuards } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { Customer } from './entities/customer.entity';
 import { JwtGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
+import { ApiKeyGuard } from '../funding-provider/guard/api-key.guard';
+import { CreateCustomerDto } from './dto/create-customer.dto';
 
+
+@UseGuards(JwtGuard, RoleGuard)
+@UseGuards(ApiKeyGuard)
 @ApiTags('customers')
 @Controller('customer')
-@UseGuards(JwtGuard, RoleGuard)
 export class CustomerController {
   constructor(private readonly customersService: CustomerService) {}
-
 
   @Post('create')
   @ApiOperation({ summary: 'Crear un cliente asociado a un proveedor' })
   @ApiResponse({ status: 201, description: 'Cliente creado con éxito' })
   @ApiResponse({ status: 400, description: 'Error al crear el cliente' })
-  // async createCustomer(@Body() createCustomerDto: CreateCustomerDto): Promise<Customer> {
-  //   try {
-  //     const customer = await this.customersService.createCustomer(createCustomerDto);
-  //     return customer;
-  //   } catch (error) {
-  //     throw new HttpException('Error al crear el cliente', HttpStatus.BAD_REQUEST);
-  //   }
-  // }
+  async createCustomer(@Body() createCustomerDto: CreateCustomerDto, @Req() req: any): Promise<Customer> {
+      try {
+          const userId = req.user.id;  // Obtener el ID del usuario autenticado
+          const customer = await this.customersService.createCustomer(createCustomerDto, userId);  // Pasar el ID del usuario al servicio
+          return customer;
+      } catch (error) {
+        console.log(error)
+          throw new ConflictException('Error al crear el cliente');
+      }
+  }
+  
+  
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener detalles de un cliente por ID' })

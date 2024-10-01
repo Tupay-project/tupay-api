@@ -33,11 +33,32 @@ export class AuthController {
       throw new HttpException('Error al registrar usuario', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+    
+  @Post('login')
+  async handleLogin(@Body() loginBody: AuthLoginDto) {
+    try {
+      console.log('Petición de loginBody recibida:', loginBody);
+      const data = await this.authService.loginUser(loginBody);
+      return {
+        message: 'Inicio de sesión exitoso',
+        data,
+      };
+    } catch (error) {
+      console.error('Error en el inicio de sesión:', error.message);
+      throw new HttpException(
+        {
+          status: HttpStatus.UNAUTHORIZED,
+          error: error.message || 'Error al iniciar sesión',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+  }
   
 
 
   @UseGuards(JwtGuard, RoleGuard)
-  @SetMetadata('roles', 'admin')  // Solo los administradores pueden registrar proveedores
+  @SetMetadata('roles', 'admin')  // <======== Solo los administradores pueden registrar proveedores
   @Post('register-provider')
   async registerProvider(@Req() req: Request, @Body() registerBody: AuthRegisterDto) {
     const currentUser = await this.userRepository.findOne({ where: { id: req.user.id }, relations: ['roles'] });  // Cargar el usuario completo desde la base de datos
@@ -59,50 +80,33 @@ export class AuthController {
     }
   }
   
-  
-  @Post('login')
-  async handleLogin(@Body() loginBody: AuthLoginDto) {
+  @UseGuards(JwtGuard, RoleGuard)
+  @SetMetadata('roles', 'admin')  // <======== Solo los administradores pueden registrar proveedores
+  @Post('register-admin')
+  async registerAdmin(@Req() req: Request, @Body() registerBody: AuthRegisterDto) {
+    const currentUser = await this.userRepository.findOne({ where: { id: req.user.id }, relations: ['roles'] });  // Cargar el usuario completo desde la base de datos
+  // console.log('=========>>>> pasandoi',currentUser.roles)
+    if (!currentUser) {
+      throw new HttpException('Usuario no encontrado', HttpStatus.UNAUTHORIZED);
+    }
+    
     try {
-      console.log('Petición de loginBody recibida:', loginBody);
-      const data = await this.authService.loginUser(loginBody);
+      // Registrar el nuevo proveedor, creado por el admin autenticado
+      const provider = await this.authService.registerUserWithRole(registerBody, UserRole.ADMIN, currentUser);
       return {
-        message: 'Inicio de sesión exitoso',
-        data,
+        message: 'Proveedor registrado con éxito',
+        provider,
       };
     } catch (error) {
-      console.error('Error en el inicio de sesión:', error.message);
-      throw new HttpException(
-        {
-          status: HttpStatus.UNAUTHORIZED,
-          error: error.message || 'Error al iniciar sesión',
-        },
-        HttpStatus.UNAUTHORIZED,
-      );
+      console.error('Error durante el registro del proveedor:', error);
+      throw new HttpException('Error al registrar proveedor', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-//   @UseGuards(JwtGuard)
-//   @Get('current-user')
-//  async currentUser(@Req() req:Request) {
-  
-//     const user = req.user; // Esto viene del JwtGuard
-//     console.log('Request', user);
-//     console.log('Request user.roles', user.roles);
 
-
-//     if (!user) {
-//       return { message: 'Usuario no autenticado' };
-//     }
-
-//     // Llamada al servicio para obtener los detalles del usuario
-//     const userDetails = await this.authService.currentUser(user.id);
-//     if (!userDetails) {
-//       return { message: 'Usuario no encontrado' };
-//     }
-
-//     return userDetails;
   
   
-//   }
+
+
 
 @UseGuards(JwtGuard)
 @Get('current-user')
