@@ -32,6 +32,7 @@ type Transaction {
   status: String!
   createdAt: DateTime!
   failureReason: String
+  paymentMethod: String!
   type: String
   metadata: String
 }

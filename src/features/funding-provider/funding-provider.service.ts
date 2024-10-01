@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApiKeyService } from '../api-key/api-key.service';
@@ -193,31 +193,7 @@ export class FundingProviderService {
   
   
   
-  // async sendToExternalApi(transaction: Transaction): Promise<string> {
-  //   const externalApiUrl = 'https://api.trytoku.com/transfer'; // Verifica si esta URL es correcta
-  
-  //   const payload = {
-  //     accountNumber: transaction.provider.accountNumber,  
-  //     amount: transaction.amount,  
-  //     reference: transaction.paymentReference,  
-  //     callbackUrl: 'https://api.tupay.finance/webhook/transaction-status',  // Verifica que esta URL sea válida
-  //   };
-  
-  //   try {
-  //     const response = await this.httpService.post(externalApiUrl, payload).toPromise();
-      
-  //     if (response.status !== 200) {
-  //       throw new Error('Error al enviar la solicitud a la API externa');
-  //     }
-  
-  //     const paymentLink = response.data.paymentLink;
-  //     return paymentLink;
-  //   } catch (error) {
-  //     console.error('Error en la solicitud externa:', error.message);
-  //     throw new HttpException('Error en la solicitud de la transferencia', HttpStatus.BAD_REQUEST);
-  //   }
-  // }
-
+ 
   async sendToExternalApi(transaction: Transaction): Promise<string> {
     // Simulación de una respuesta exitosa de la API externa de prueba
     const paymentLink = `https://payment-provider.com/pay?transaction=${transaction.paymentReference}`;
@@ -229,7 +205,24 @@ export class FundingProviderService {
   }
   
   
-  
+  async findOne(providerId: string): Promise<FundingProvider> {
+    const provider = await this.providerRepository.findOne({
+      where: { id: providerId },
+    });
+
+    if (!provider) {
+      throw new NotFoundException('Proveedor no encontrado');
+    }
+
+    return provider;
+  }
+
+  // Método para actualizar los datos del proveedor
+  async update(providerId: string, updateData: Partial<FundingProvider>): Promise<FundingProvider> {
+    await this.providerRepository.update(providerId, updateData);
+    const updatedProvider = await this.findOne(providerId);
+    return updatedProvider;
+  }
   
 
 

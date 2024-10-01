@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Controller, Post, Body, Param, HttpException, HttpStatus, Get } from '@nestjs/common';
+import { Controller, Post, Body, Param, HttpException, HttpStatus, Get, Render, Query } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { ProcessPaymentDto } from './dto/ProcessPaymentDto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
@@ -40,12 +40,12 @@ export class PaymentController {
   }
 
 
-  @Post('pay/:invoiceId')
-  @ApiOperation({ summary: 'Procesar un pago para una factura pendiente' })
-  @ApiParam({ name: 'invoiceId', description: 'ID de la factura a pagar' })
-  processPayment(@Param('invoiceId') invoiceId: string, @Body() paymentData: any) {
-    return `Pago procesado para la factura ${invoiceId}`;
-  }
+  // @Post('pay/:invoiceId')
+  // @ApiOperation({ summary: 'Procesar un pago para una factura pendiente' })
+  // @ApiParam({ name: 'invoiceId', description: 'ID de la factura a pagar' })
+  // processPayment(@Param('invoiceId') invoiceId: string, @Body() paymentData: any) {
+  //   return `Pago procesado para la factura ${invoiceId}`;
+  // }
 
   @Post('confirm/:paymentId')
   @ApiOperation({ summary: 'Confirmar un pago' })
@@ -79,4 +79,27 @@ export class PaymentController {
   getTransactionsForProvider(@Param('providerId') providerId: string) {
     return `Transacciones del proveedor ${providerId}`;
   }
+
+  // 
+
+  @Get()
+  @Render('payment')  
+  showPaymentPage(
+    @Query('invoiceId') invoiceId: string,
+    @Query('amount') amount: number,
+    @Query('currency') currency: string,
+    @Query('numberAgreement') numberAgreement: string,  
+  ) {
+    return { invoiceId, amount, currency, numberAgreement };  
+  }
+
+
+  @Post('process-payment')
+processPayment(@Body() paymentData: any) {
+  const { invoiceId, amount } = paymentData;
+  return `Procesando pago de ${amount} para la factura ${invoiceId}`;
+}
+
+
+  
 }

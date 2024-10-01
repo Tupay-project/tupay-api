@@ -3,10 +3,13 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './shared/pipes/all-exceptions.filter';
 import { envs } from './shared/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
+
 // import { WebhookService } from './shared/services/webhook.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Establecer prefijo global para las rutas de la API
   app.setGlobalPrefix('api/v1');
@@ -30,6 +33,10 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
+
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));  // Se sale de "src" y apunta a "views"
+  app.setViewEngine('hbs');  // Usamos Handlebars como motor de plantillas
+
 
     // Configurar la documentación Swagger en un módulo aparte
     // await DocumentationModule.setup(app);

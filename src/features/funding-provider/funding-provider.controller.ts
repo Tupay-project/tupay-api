@@ -6,7 +6,6 @@ import { CreateProviderDto } from './dto/CreateProviderDto';
 import { ApiKeyGuard } from './guard/api-key.guard';
 import { LoginProviderDto } from './dto/LoginProviderDto';
 import { UpdateProviderDto } from './dto/UpdateProviderDto';
-import { WebhookServiceTransfeProviders } from './services/webkook-transfe_provider.service';
 import { AddFundsDto } from './dto/AddFundsDto';
 
 
@@ -15,7 +14,6 @@ import { AddFundsDto } from './dto/AddFundsDto';
 export class FundingProviderController {
   constructor(
     private readonly fundingProviderService: FundingProviderService,
-    private readonly webhookService: WebhookServiceTransfeProviders
   ) {}
 
 
@@ -85,15 +83,6 @@ export class FundingProviderController {
     return { message: 'Access granted to provider info' };
   }
 
-  @Post('transaction-status')
-  async updateTransactionStatus(@Body() webhookPayload: any) {
-    try {
-      await this.webhookService.handleTransactionStatus(webhookPayload);
-      return { message: 'Transaction status updated' };
-    } catch (error) {
-      throw new HttpException('Failed to update transaction status', HttpStatus.BAD_REQUEST);
-    }
-  }
 
   // @Post('add-funds')
   // @UseGuards(ApiKeyGuard)  // Aplica el ApiKeyGuard a esta ruta

@@ -43,6 +43,10 @@ export class Transaction {
   @ManyToOne(() => Loan, load => load.transactions)
   loan: Loan;
   
+  @Column({ nullable: true })
+  @Field()
+  paymentMethod: string; // Asegúrate de tener este campo definido aquí
+
   @Field({ nullable: true }) 
   @Column()
   type: 'credit' | 'debit'; 

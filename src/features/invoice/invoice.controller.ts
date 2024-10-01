@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Get } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Get, NotFoundException, Param } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -35,7 +35,36 @@ export class InvoiceController {
       throw new HttpException('Error al obtener las facturas', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+  @Get(':invoiceId')
+@ApiOperation({ summary: 'Obtener una factura por su ID' })
+@ApiResponse({ status: 200, description: 'Factura obtenida con éxito' })
+@ApiResponse({ status: 404, description: 'Factura no encontrada' })
+@ApiResponse({ status: 500, description: 'Error al obtener la factura' })
+async findInvoiceById(@Param('invoiceId') invoiceId: string): Promise<Invoice> {
+  try {
+    const invoice = await this.invoiceService.findInvoiceById(invoiceId);
+    return invoice;
+  } catch (error) {
+    throw new NotFoundException(error.message);
+  }
+}
 
-  // stripe
+
+
+  @Get('initiate-payment/:customerId/:invoiceReference')
+  async initiatePayment(
+    @Param('customerId') customerId: string,
+    @Param('invoiceReference') invoiceReference: string,
+  ) {
+    try {
+      const paymentDetails = await this.invoiceService.initiatePayment(
+        customerId,
+        invoiceReference,
+      );
+      return paymentDetails;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
   
 }

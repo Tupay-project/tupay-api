@@ -7,11 +7,10 @@ import { PassportModule } from '@nestjs/passport';
 import { envs } from 'src/shared/config';
 import { HttpModule } from '@nestjs/axios';
 import { WebhookControllerTransfeProvider } from './controllers/webhook.controller';
-import { WebhookServiceTransfeProviders } from './services/webkook-transfe_provider.service';
 
 @Module({
   controllers: [FundingProviderController,WebhookControllerTransfeProvider],
-  providers: [FundingProviderService,WebhookServiceTransfeProviders],
+  providers: [FundingProviderService],
   imports:[ApiKeyModule,  
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({

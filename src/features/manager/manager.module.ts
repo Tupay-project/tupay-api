@@ -8,6 +8,7 @@ import { FundingProviderModule } from '../funding-provider/funding-provider.modu
 import { CustomerModule } from '../customer/customer.module';
 import { PaymentModule } from '../payment/payment.module';
 import { InvoiceModule } from '../invoice/invoice.module';
+import { TransactionController } from './controllers/transation.controllers';
 
 @Module({
   imports:[
@@ -17,6 +18,7 @@ import { InvoiceModule } from '../invoice/invoice.module';
     CustomerModule,
     PaymentModule
   ],
+  controllers:[TransactionController],
   exports: [WebhookService],
   providers: [ManagerResolver, ManagerService,TransactionService,WebhookService],
 })
