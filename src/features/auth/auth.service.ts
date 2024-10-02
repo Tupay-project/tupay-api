@@ -11,6 +11,7 @@ import { generateHash, compareHash } from 'src/shared/utils/handleBycrip';
 import { Role } from '../role/entities/roles.entity';
 import { AuthLoginDto } from './dto/login.auth.dto';
 import { UserRole } from 'src/shared/enum/roles.enum';
+import { RevokedToken } from '../user/entities/revokedToken.entity';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,9 @@ export class AuthService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
+        @InjectRepository(RevokedToken) 
+        private readonly refreshTokenRepository: Repository<RevokedToken>,
+
 
         @InjectRepository(Role)
         private readonly roleRepository: Repository<Role>,
@@ -210,5 +214,17 @@ export class AuthService {
     }
     
 
-    public async logout() { }
-}
+    async logout(userId: string): Promise<{ message: string }> {
+      try {
+        // Suponiendo que estás manejando tokens de refresco, los eliminamos
+        await this.refreshTokenRepository.delete({ userId });
+  
+        // Si manejas una lista de tokens revocados, podrías agregar el token actual a esa lista aquí.
+  
+        return { message: 'Sesión cerrada con éxito' };
+      } catch (error) {
+        throw new HttpException('Error al cerrar sesión', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
+

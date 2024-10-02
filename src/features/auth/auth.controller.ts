@@ -104,10 +104,6 @@ export class AuthController {
   }
 
   
-  
-
-
-
 @UseGuards(JwtGuard)
 @Get('current-user')
 async currentUser(@Req() req: Request) {
@@ -133,7 +129,17 @@ async currentUser(@Req() req: Request) {
   };
 }
 
+@Post('logout')
+@UseGuards(JwtGuard)  
+async logout(@Req() req: Request) {
+  try {
+    console.log(`User ${req.user.id} ha cerrado sesión.`);
 
-  @Post('logout')
-  logout() {}
+    return { message: 'Sesión cerrada con éxito' };
+  } catch (error) {
+    console.error('Error en el cierre de sesión:', error);
+    throw new HttpException('Error al cerrar sesión', HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
 }
