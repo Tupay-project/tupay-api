@@ -3,6 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne } f
 import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';  // Ajusta el path a la entidad FundingProvider
 import { Invoice } from 'src/features/invoice/entities/invoice.entity';
 import { Loan } from 'src/features/loan/entities/loan.entity';
+import { User } from 'src/features/user/entities/user.entity';
 
 @ObjectType() // Decorador para GraphQL
 @Entity('transactions')
@@ -50,6 +51,10 @@ export class Transaction {
   @Field({ nullable: true }) 
   @Column()
   type: 'credit' | 'debit'; 
+
+  @ManyToOne(() => User, (user) => user.transactions)
+  @Field(() => User)
+  user: User;
 
   @Column({ type: 'json', nullable: true })
   @Field(() => String, { nullable: true })

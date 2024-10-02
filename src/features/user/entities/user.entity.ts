@@ -2,6 +2,7 @@ import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { Customer } from 'src/features/customer/entities/customer.entity';
 import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
 import { Loan } from 'src/features/loan/entities/loan.entity';
+import { Transaction } from 'src/features/manager/entities/transaction.entity';
 import { Role } from 'src/features/role/entities/roles.entity';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne, ManyToMany, JoinTable, OneToMany, ManyToOne } from 'typeorm';
 
@@ -94,4 +95,8 @@ export class User {
   @Column({ type: 'decimal', default: 0, nullable: false })
   @Field() 
   availableFunds: number;
+
+
+  @OneToMany(() => Transaction, (transaction) => transaction.user) // Relación con Transaction
+  transactions: Transaction[];
 }

@@ -13,6 +13,7 @@ type Transaction {
   failureReason: String
   paymentMethod: String!
   type: String
+  user: User!
   metadata: String
 }
 

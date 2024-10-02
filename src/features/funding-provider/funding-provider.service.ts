@@ -311,8 +311,19 @@ export class FundingProviderService {
 
   // balance
   async getProviderBalance(providerId: string): Promise<{ providerId: string; balance: number }> {
-    const provider = await this.providerRepository.findOne({
+   
+    // const providerUser = await this.userRepository.findOne({
+    //   where: { id: providerId },
+    //   relations: ['roles', 'customer'], // Relación con roles y customer
+    // });
+  
+    // if (!providerUser) {
+    //   throw new NotFoundException('Proveedor no encontrado');
+    // }
+   
+    const provider = await this.userRepository.findOne({
       where: { id: providerId },
+      relations: ['roles'],
     });
 
     if (!provider) {
@@ -338,25 +349,40 @@ export class FundingProviderService {
   }
 
   async getTransactionsByProviderId(providerId: string): Promise<Transaction[]> {
-    const provider = await this.providerRepository.findOne({
+    // Buscar el proveedor (usuario) por su ID utilizando el userRepository
+    const providerUser = await this.userRepository.findOne({
       where: { id: providerId },
-      relations: ['transactions'],  
+      relations: ['transactions'], // Cargar las transacciones relacionadas
+    });
+  
+    if (!providerUser) {
+      throw new NotFoundException('Proveedor no encontrado');
+    }
+  
+    // Devolver las transacciones relacionadas con este proveedor
+    return providerUser.transactions;
+  }
+  
+
+  async getTransactionHistory(
+    providerId: string,
+    filters: TransactionHistoryDto,
+  ): Promise<Transaction[]> {
+    // Buscar el proveedor por su ID utilizando el userRepository
+    const provider = await this.userRepository.findOne({
+      where: { id: providerId },
+      relations: ['transactions'], // Asegurarse de cargar las transacciones relacionadas
     });
   
     if (!provider) {
       throw new NotFoundException('Proveedor no encontrado');
     }
   
-    return provider.transactions;
-  }
-
-  async getTransactionHistory(
-    providerId: string,
-    filters: TransactionHistoryDto,
-  ): Promise<Transaction[]> {
+    // Inicializa una consulta para filtrar las transacciones del proveedor
     const query = this.transactionRepository.createQueryBuilder('transaction')
-      .where('transaction.providerId = :providerId', { providerId });
+      .where('transaction.userId = :userId', { userId: providerId }); // Asegurarse de usar el userId
   
+    // Aplicar los filtros si están presentes
     if (filters.startDate) {
       query.andWhere('transaction.createdAt >= :startDate', { startDate: filters.startDate });
     }
@@ -373,9 +399,11 @@ export class FundingProviderService {
       query.andWhere('transaction.status = :status', { status: filters.status });
     }
   
+    // Obtener y devolver las transacciones filtradas
     const transactions = await query.getMany();
     return transactions;
   }
+  
 
   // 
   async getInvoiceHistory(
