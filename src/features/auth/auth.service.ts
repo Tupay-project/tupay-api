@@ -70,6 +70,60 @@ export class AuthService {
         throw new HttpException('Error al registrar usuario', HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
+
+    public async registerUserProvider(userBody: AuthRegisterDto): Promise<User> {
+      console.log('Registro de proveedor - Datos recibidos:', userBody);
+    
+      // Verificar si el email ya existe
+      const existingUser = await this.userRepository.findOne({ where: { email: userBody.email } });
+      if (existingUser) {
+        console.log('Email ya registrado:', userBody.email);
+        throw new BadRequestException('El email ya está en uso.');
+      }
+    
+      let privateKey = null;
+      let accessKey = null;
+    
+      try {
+        // Encriptar la contraseña
+        const hashedPassword = await generateHash(userBody.password);
+        console.log('Contraseña encriptada:', hashedPassword);
+    
+        // Verificar si el rol "provider" existe, si no, lo crea
+        let role = await this.roleRepository.findOne({ where: { name: UserRole.PROVIDER } });
+        if (!role) {
+          console.log('Rol provider no encontrado, creando uno nuevo.');
+          role = this.roleRepository.create({ name: UserRole.PROVIDER });
+          await this.roleRepository.save(role);
+        }
+    
+        // Generar las claves privateKey y accessKey para el proveedor
+        privateKey = uuidv4();
+        accessKey = uuidv4();
+    
+        // Crear nuevo usuario con la contraseña encriptada y asignar el rol de 'provider'
+        const newUser = this.userRepository.create({
+          ...userBody,
+          password: hashedPassword,
+          roles: [role],
+          privateKey,  // Asignar la privateKey generada
+          accessKey,   // Asignar la accessKey generada
+        });
+    
+        const savedUser = await this.userRepository.save(newUser);
+        console.log('Proveedor guardado en la base de datos:', savedUser);
+    
+        // Excluir las claves de la respuesta
+        // delete savedUser.privateKey;
+        // delete savedUser.accessKey;
+    
+        return savedUser;
+      } catch (error) {
+        console.error('Error en registerUserProvider:', error);
+        throw new HttpException('Error al registrar proveedor', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+    
     
  
 
