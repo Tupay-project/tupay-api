@@ -5,7 +5,7 @@ import { Invoice } from './entities/invoice.entity';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { Customer } from 'src/features/customer/entities/customer.entity';
 import { CustomerService } from '../customer/customer.service';
-// import { TransactionService } from '../manager/services/transation.service';
+import { FundingProvider } from '../funding-provider/entities/provider.entity';
 
 @Injectable()
 export class InvoiceService {
@@ -14,11 +14,13 @@ export class InvoiceService {
     private readonly invoiceRepository: Repository<Invoice>, 
 
     @InjectRepository(Customer)
-    private readonly customerRepository: Repository<Customer>, 
+    private readonly customerRepository: Repository<Customer>,
+
+    @InjectRepository(FundingProvider)
+    private readonly providerRepository: Repository<FundingProvider>,
 
     private readonly customerService: CustomerService, 
 
-    // private readonly transactionService: TransactionService, 
   ) {}
 
   async createInvoice(createInvoiceDto: CreateInvoiceDto): Promise<Invoice> {
@@ -28,7 +30,10 @@ export class InvoiceService {
       if (!customer) {
         throw new HttpException('Customer not found', HttpStatus.NOT_FOUND);
       }
-  
+    // Validar que la fecha de vencimiento no sea anterior a la fecha de emisión
+        if (createInvoiceDto.dueDate < createInvoiceDto.issueDate) {
+            throw new HttpException('The due date cannot be earlier than the issue date', HttpStatus.BAD_REQUEST);
+        }
       // Generar la referencia de pago (5 dígitos aleatorios) y agregar el prefijo 'ref-'
       const paymentReference = 'ref-' + Math.random().toString().slice(2, 7);
   
@@ -38,9 +43,17 @@ export class InvoiceService {
       // Generar el link de pago (antes de guardar la factura)
       const paymentLink = `http://localhost:5000/api/v1/payments?invoiceId=${paymentReference}&amount=${createInvoiceDto.amount}&currency=USD&numberAgreement=${numberAgreement}`;
   
+   // Buscar el proveedor del cliente
+   const provider = await this.providerRepository.findOne({ where: { id: customer.provider.id } });
+   if (!provider) {
+       throw new HttpException('Provider not found for this customer', HttpStatus.NOT_FOUND);
+   }
+
+
       // Crear la nueva factura con el link de pago generado
       const invoice = this.invoiceRepository.create({
         customer,  // Asociar la factura con el cliente
+        provider,  // Asociar la factura con el proveedor
         amount: createInvoiceDto.amount,
         description: createInvoiceDto.description,
         issueDate: createInvoiceDto.issueDate,
@@ -59,9 +72,6 @@ export class InvoiceService {
     }
   }
   
-  
-  
-
   async findInvoiceById(invoiceId: string): Promise<Invoice> {
     try {
       return await this.invoiceRepository.findOne({ where: { id: invoiceId } });

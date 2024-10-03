@@ -16,6 +16,7 @@ import { RoleModule } from './features/role/role.module';
 import { RolesService } from './features/role/role.service';
 import { LoanModule } from './features/loan/loan.module';
 import { WebhookModule } from './features/webhook/webhook.module';
+import { EmailModule } from './shared/modules/email/email.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { WebhookModule } from './features/webhook/webhook.module';
     PaymentModule,
     RoleModule,
     WebhookModule,
+    EmailModule,
   
   ],
   controllers: [],

@@ -3,6 +3,10 @@ import * as joi from 'joi';
 
 interface EnvVars {
   PORT: number;
+  SENDGRID_API_KEY:string
+  SENDGRID_SENDER:string
+
+  
   JWT_ACCESS_TOKEN_SECRET: string;
   JWT_REFRESH_TOKEN_SECRET: string;
   JWT_ACCESS_TOKEN_EXPIRATION_TIME: string;
@@ -25,6 +29,10 @@ interface EnvVars {
 // Esquema de validación con Joi
 const envsSchema = joi.object({
   PORT: joi.number().required(),
+  SENDGRID_API_KEY:joi.string().required(),
+  SENDGRID_SENDER:joi.string().required(),
+
+
   JWT_ACCESS_TOKEN_SECRET: joi.string().required(),
   JWT_REFRESH_TOKEN_SECRET: joi.string().required(),
   JWT_ACCESS_TOKEN_EXPIRATION_TIME: joi.string().required(),
@@ -62,6 +70,11 @@ const envVars: EnvVars = value;
 // Exportación de las variables de entorno validadas
 export const envs = {
   PORT: envVars.PORT,
+
+  SENDGRID_API_KEY: envVars.SENDGRID_API_KEY,
+  SENDGRID_SENDER: envVars.SENDGRID_SENDER,
+
+
   JWT_ACCESS_TOKEN_SECRET: envVars.JWT_ACCESS_TOKEN_SECRET,
   JWT_REFRESH_TOKEN_SECRET: envVars.JWT_REFRESH_TOKEN_SECRET,
   JWT_ACCESS_TOKEN_EXPIRATION_TIME: envVars.JWT_ACCESS_TOKEN_EXPIRATION_TIME,
