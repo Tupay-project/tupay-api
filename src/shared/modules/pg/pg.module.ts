@@ -14,23 +14,10 @@ import { Role } from 'src/features/role/entities/roles.entity';
 import { RevokedToken } from 'src/features/user/entities/revokedToken.entity';
 import { User } from 'src/features/user/entities/user.entity';
 import { envs } from 'src/shared/config';
-// import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
-// import { CreditRequest } from 'src/features/credit/entities/credit.entity';
-// import { FundingProvider } from 'src/features/funding-provider/entitie/funding.entity';
-// import { Permission } from 'src/features/users/entities/permission.entity';
-// import { Role } from 'src/features/users/entities/roles.entity';
-// import { User } from 'src/features/users/entities/user.entity';
-// import { WithdrawalRequest } from 'src/features/withdrawal/entitie/WithdrawalRequest.entity';
-// import { envs } from 'src/shared/config';
+
 import { SeedEntity } from 'src/shared/seed/entitie/seed-entity';
 
 
-
-// DATABASE_NAME=louncher
-// DATABASE_PASSWORD=wnpsmSxk80Pr
-// DATABASE_USERNAME=louncher_owner
-// DATABASE_PORT=5432
-// DATABASE_HOST=ep-lingering-darkness-a5fjaydb.us-east-2.aws.neon.tech
 
 
 @Global()
