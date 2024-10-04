@@ -22,44 +22,28 @@ export class CustomerService {
   ) {}
 
   // Método para crear un cliente
-  async createCustomer(createCustomerDto: CreateCustomerDto, userId: string, providerId: string): Promise<Customer> {
+  async createCustomer(createCustomerDto: CreateCustomerDto, providerId: string): Promise<Customer> {
     try {
-      // Buscar el usuario que está creando el cliente
-      const user = await this.userRepository.findOne({
-        where: { id: userId },
-        relations: ['roles'],
-      });
-  
-      if (!user) {
-        throw new NotFoundException('Usuario no encontrado');
-      }
-  
-      // Verificar si el usuario tiene el rol de 'provider'
-      const isProvider = user.roles.some(role => role.name === 'provider');
-      if (!isProvider) {
-        throw new ConflictException('El usuario no tiene el rol de proveedor');
-      }
-  
       // Buscar el proveedor asociado al ID proporcionado
       const provider = await this.providerRepository.findOne({
         where: { id: providerId },
       });
+      console.log('ID del proveedor recibido:', providerId);
   
       if (!provider) {
         throw new NotFoundException('Proveedor no encontrado');
       }
   
-      // Crear el cliente con el proveedor adecuado y el usuario
+      // Crear el cliente con el proveedor adecuado
       const customer = this.customersRepository.create({
         ...createCustomerDto,
         provider,  // Asignamos el provider correcto
-        user,      // Asignamos el usuario que creó el cliente
       });
   
       // Guardar el cliente en la base de datos
       const savedCustomer = await this.customersRepository.save(customer);
   
-      return savedCustomer; // Devolver el cliente completo, incluyendo provider y user
+      return savedCustomer; // Devolver el cliente completo, incluyendo provider
     } catch (error) {
       console.error('Error creando el cliente:', error);
       throw error instanceof NotFoundException || error instanceof ConflictException

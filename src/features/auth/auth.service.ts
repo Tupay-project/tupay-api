@@ -12,6 +12,7 @@ import { Role } from '../role/entities/roles.entity';
 import { AuthLoginDto } from './dto/login.auth.dto';
 import { UserRole } from 'src/shared/enum/roles.enum';
 import { RevokedToken } from '../user/entities/revokedToken.entity';
+import { FundingProvider } from '../funding-provider/entities/provider.entity';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +22,9 @@ export class AuthService {
         private readonly userRepository: Repository<User>,
         @InjectRepository(RevokedToken) 
         private readonly refreshTokenRepository: Repository<RevokedToken>,
+
+        @InjectRepository(FundingProvider) 
+        private readonly providerRepository: Repository<FundingProvider>,
 
 
         @InjectRepository(Role)
@@ -71,7 +75,7 @@ export class AuthService {
       }
     }
 
-    public async registerUserProvider(userBody: AuthRegisterDto): Promise<User> {
+    public async registerUserProvider(userBody: AuthRegisterDto): Promise<{ message: string, provider: User }> {
       console.log('Registro de proveedor - Datos recibidos:', userBody);
     
       // Verificar si el email ya existe
@@ -113,16 +117,27 @@ export class AuthService {
         const savedUser = await this.userRepository.save(newUser);
         console.log('Proveedor guardado en la base de datos:', savedUser);
     
-        // Excluir las claves de la respuesta
-        // delete savedUser.privateKey;
-        // delete savedUser.accessKey;
+        // Ahora crear un registro en la entidad FundingProvider
+        const newProvider = this.providerRepository.create({
+          name: userBody.name,
+          accountNumber: null, // Inicializarlo o generar un número de cuenta si es necesario
+          status: 'active', // Estado inicial del proveedor
+          type: 'person', // Aquí puedes definir el tipo o ajustarlo según el DTO
+          privateKey: savedUser.privateKey, // Usar la misma privateKey generada para el user
+          accessKey: savedUser.accessKey, // Usar la misma accessKey generada para el user
+          createdBy: savedUser, // Asignar el mismo usuario creado
+        });
     
-        return savedUser;
+        await this.providerRepository.save(newProvider);
+        console.log('Registro del proveedor guardado en la entidad FundingProvider.');
+    
+        return { message: 'Proveedor registrado con éxito', provider: savedUser };
       } catch (error) {
         console.error('Error en registerUserProvider:', error);
         throw new HttpException('Error al registrar proveedor', HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
+    
     
     
  

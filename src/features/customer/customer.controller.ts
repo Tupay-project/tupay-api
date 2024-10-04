@@ -1,4 +1,4 @@
-import { Body, ConflictException, Controller, Get, Param, Post, Put, Req, SetMetadata, UseGuards, NotFoundException } from '@nestjs/common';
+import { Body, ConflictException, Controller, Get, Param, Post, Put, SetMetadata, UseGuards, NotFoundException } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -15,24 +15,28 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 export class CustomerController {
   constructor(private readonly customersService: CustomerService) {}
 
+  @ApiOperation({ summary: 'Crear un cliente asociado a un proveedor' })
+  @ApiResponse({ status: 201, description: 'Cliente creado con éxito' })
+  @ApiResponse({ status: 400, description: 'Error al crear el cliente' })
   @Post('create')
   @ApiOperation({ summary: 'Crear un cliente asociado a un proveedor' })
   @ApiResponse({ status: 201, description: 'Cliente creado con éxito' })
   @ApiResponse({ status: 400, description: 'Error al crear el cliente' })
-  async createCustomer(@Body() createCustomerDto: CreateCustomerDto, @Req() req: any): Promise<Customer> {
+  async createCustomer(@Body() createCustomerDto: CreateCustomerDto): Promise<Customer> {
     try {
-      const userId = req.user.id; // Obtener el ID del usuario autenticado
-      const providerId = createCustomerDto.providerId; // Obtener el ID del proveedor del DTO (si lo incluyes en el DTO)
-  
-      // Pasar el ID del usuario y del proveedor al servicio
-      const customer = await this.customersService.createCustomer(createCustomerDto, userId, providerId); 
-  
+      // Obtener el ID del proveedor desde el DTO
+      const providerId = createCustomerDto.providerId; // Asegúrate de que providerId esté incluido en CreateCustomerDto
+      
+      // Pasar el ID del proveedor al servicio para crear el cliente
+      const customer = await this.customersService.createCustomer(createCustomerDto, providerId);
+      
       return customer;
     } catch (error) {
       console.error('Error creando el cliente:', error);
       throw new ConflictException('Error al crear el cliente');
     }
   }
+  
   
 
   @Get(':id')

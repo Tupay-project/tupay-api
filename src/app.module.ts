@@ -6,6 +6,7 @@ import { PgModule } from './shared/modules';
 import { CustomerModule } from './features/customer/customer.module';
 import { RoleModule } from './features/role/role.module';
 import { RolesService } from './features/role/role.service';
+import { FundingProviderModule } from './features/funding-provider/funding-provider.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { RolesService } from './features/role/role.service';
     UserModule,
     CustomerModule,
     RoleModule,
+    FundingProviderModule
 
   
   ],
