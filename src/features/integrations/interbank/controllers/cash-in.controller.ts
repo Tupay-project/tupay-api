@@ -1,15 +1,52 @@
-import { Controller, Post, Get, Body, Param } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Res } from '@nestjs/common';
 import { CashInService } from '../services/cash-in.service';
+import { PrinterService } from 'src/shared/modules/printer/printer.service';
+import { Response } from 'express';
 
 @Controller('cashin')
 export class CashInController {
-  constructor(private readonly cashInService: CashInService) {}
+  constructor(
+    private readonly cashInService: CashInService,
+    private readonly printerService: PrinterService
+  ) {}
 
   // Endpoint para generar una nueva transacción para una factura
   @Post('generate-transaction')
   generateTransaction(@Body('facturaId') facturaId: number, @Body('clientId') clientId: number) {
     return this.cashInService.generateTransaction(facturaId, clientId);
   }
+
+  @Post('generate-invoice')
+  async generateInvoice(
+    @Body('clientData') clientData: any,
+    @Body('invoiceDetails') invoiceDetails: any[],
+    @Body('totalAmount') totalAmount: number,
+    @Body('invoiceNumber') invoiceNumber: string,
+    @Body('issueDate') issueDate: string,
+    @Body('convenioNumber') convenioNumber: string, 
+    @Res() res: Response
+  ) {
+    try {
+      const pdfDoc = this.printerService.createInvoicePdf(
+        clientData,
+        invoiceDetails,
+        totalAmount,
+        invoiceNumber,
+        issueDate,
+        convenioNumber
+      );
+  
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=factura.pdf');
+  
+      pdfDoc.pipe(res);
+      pdfDoc.end();
+    } catch (error) {
+      console.error('Error al generar la factura:', error); // Agregar logs para verificar el problema
+      res.status(500).send('Error interno del servidor');
+    }
+  }
+  
 
   // Endpoint para seleccionar el método de pago para la transacción
   @Post('select-payment-method')

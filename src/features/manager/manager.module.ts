@@ -12,9 +12,9 @@ import { TransactionController } from './controllers/transation.controllers';
 
 @Module({
   imports:[
-    InvoiceModule,
+    // InvoiceModule,
     HttpModule,
-    FundingProviderModule,
+    // FundingProviderModule,
     CustomerModule,
     PaymentModule
   ],

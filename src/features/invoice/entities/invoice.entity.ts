@@ -68,4 +68,14 @@ export class Invoice {
   @UpdateDateColumn()
   @Field() 
   updatedAt: Date;
+
+
+  @Column({ nullable: true })
+  pdfUrl: string; 
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  clientName: string;
+  
+  @Column({ nullable: true })
+  totalAmount: number;
 }

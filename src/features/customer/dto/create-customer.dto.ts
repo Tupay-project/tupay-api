@@ -20,5 +20,9 @@ export class CreateCustomerDto {
   @ApiProperty({ description: 'Número de teléfono del cliente', example: '+573004567890' })
   @IsString()
   phoneNumber: string;  // Número de teléfono del cliente
+ 
+ 
+  @IsString()
+  providerId: string; // Agregar este campo si no lo tienes
   
 }

@@ -11,7 +11,7 @@ import { JwtStrategy } from '../auth/strategy/jwt.strategy';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  controllers: [FundingProviderController,WebhookControllerTransfeProvider],
+  // controllers: [FundingProviderController,WebhookControllerTransfeProvider],
   providers: [FundingProviderService,JwtStrategy],
   imports:[ApiKeyModule,  
     PassportModule.register({ defaultStrategy: 'jwt' }),

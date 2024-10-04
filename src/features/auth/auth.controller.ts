@@ -35,20 +35,20 @@ export class AuthController {
   }
 
   
-  @Post('register-provider')
-  async handleRegisterProvider(@Body() registerBody: AuthRegisterDto) {
-    try {
-      console.log('Petición de registro recibida:', registerBody); 
-      const user = await this.authService.registerUserProvider(registerBody);
-      return {
-        message: 'provider registrado con éxito',
-        user,
-      };
-    } catch (error) {
-      console.error('Error durante el registro de provider:', error);
-      throw new HttpException('Error al registrar provider', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+  // @Post('register-provider')
+  // async handleRegisterProvider(@Body() registerBody: AuthRegisterDto) {
+  //   try {
+  //     console.log('Petición de registro recibida:', registerBody); 
+  //     const user = await this.authService.registerUserProvider(registerBody);
+  //     return {
+  //       message: 'provider registrado con éxito',
+  //       user,
+  //     };
+  //   } catch (error) {
+  //     console.error('Error durante el registro de provider:', error);
+  //     throw new HttpException('Error al registrar provider', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
     
   @Post('login')
   async handleLogin(@Body() loginBody: AuthLoginDto) {
@@ -74,7 +74,7 @@ export class AuthController {
 
 
   @UseGuards(JwtGuard, RoleGuard)
-  @SetMetadata('roles', 'admin')  // <======== Solo los administradores pueden registrar proveedores
+  @SetMetadata('roles', 'provider')  // <======== Solo los administradores pueden registrar proveedores
   @Post('register-provider')
   async registerProvider(@Req() req: Request, @Body() registerBody: AuthRegisterDto) {
     const currentUser = await this.userRepository.findOne({ where: { id: req.user.id }, relations: ['roles'] });  // Cargar el usuario completo desde la base de datos
