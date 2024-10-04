@@ -73,28 +73,28 @@ export class AuthController {
   
 
 
-  @UseGuards(JwtGuard, RoleGuard)
-  @SetMetadata('roles', 'admin')  // <======== Solo los administradores pueden registrar proveedores
-  @Post('register-provider')
-  async registerProvider(@Req() req: Request, @Body() registerBody: AuthRegisterDto) {
-    const currentUser = await this.userRepository.findOne({ where: { id: req.user.id }, relations: ['roles'] });  // Cargar el usuario completo desde la base de datos
+  // @UseGuards(JwtGuard, RoleGuard)
+  // @SetMetadata('roles', 'provider')  // <======== Solo los administradores pueden registrar proveedores
+  // @Post('register-provider')
+  // async registerProvider(@Req() req: Request, @Body() registerBody: AuthRegisterDto) {
+  //   const currentUser = await this.userRepository.findOne({ where: { id: req.user.id }, relations: ['roles'] });  // Cargar el usuario completo desde la base de datos
   
-    if (!currentUser) {
-      throw new HttpException('Usuario no encontrado', HttpStatus.UNAUTHORIZED);
-    }
+  //   if (!currentUser) {
+  //     throw new HttpException('Usuario no encontrado', HttpStatus.UNAUTHORIZED);
+  //   }
     
-    try {
-      // Registrar el nuevo proveedor, creado por el admin autenticado
-      const provider = await this.authService.registerUserWithRole(registerBody, UserRole.PROVIDER, currentUser);
-      return {
-        message: 'Proveedor registrado con éxito',
-        provider,
-      };
-    } catch (error) {
-      console.error('Error durante el registro del proveedor:', error);
-      throw new HttpException('Error al registrar proveedor', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+  //   try {
+  //     // Registrar el nuevo proveedor, creado por el admin autenticado
+  //     const provider = await this.authService.registerUserWithRole(registerBody, UserRole.PROVIDER, currentUser);
+  //     return {
+  //       message: 'Proveedor registrado con éxito',
+  //       provider,
+  //     };
+  //   } catch (error) {
+  //     console.error('Error durante el registro del proveedor:', error);
+  //     throw new HttpException('Error al registrar proveedor', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
   
   @UseGuards(JwtGuard, RoleGuard)
   @SetMetadata('roles', 'admin')  // <======== Solo los administradores pueden registrar proveedores

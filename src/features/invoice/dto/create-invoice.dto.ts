@@ -37,3 +37,6 @@ export class CreateInvoiceDto {
   @IsString()
   paymentReference?: string;
 }
+
+// "privateKey": "dfa3d183-d0b0-4374-a534-fbded1c4a056",
+// "accessKey": "8cd1e3da-35f9-48c7-b8d6-60f319fbfd2e",

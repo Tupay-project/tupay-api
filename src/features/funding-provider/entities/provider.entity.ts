@@ -17,9 +17,9 @@ export class FundingProvider {
   @Field() 
   name: string;
 
-  @Column({ unique: true, length: 20 })
-  @Field() 
-  accountNumber: string;
+  // @Column({ unique: true, length: 20 })
+  // @Field() 
+  // accountNumber: string;
 
   @Column({ default: 'active' })
   @Field() 
@@ -52,6 +52,10 @@ export class FundingProvider {
   @CreateDateColumn()
   @Field() 
   createdAt: Date;
+
+  @Column({ unique: true, length: 20, nullable: true }) // Cambiar nullable: false a nullable: true
+@Field({ nullable: true })
+accountNumber: string;
 
   @Column({ nullable: true })
   @Field({ nullable: true }) // Puede ser nulo en GraphQL

@@ -12,6 +12,7 @@ import { Role } from '../role/entities/roles.entity';
 import { AuthLoginDto } from './dto/login.auth.dto';
 import { UserRole } from 'src/shared/enum/roles.enum';
 import { RevokedToken } from '../user/entities/revokedToken.entity';
+import { FundingProvider } from '../funding-provider/entities/provider.entity';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +22,9 @@ export class AuthService {
         private readonly userRepository: Repository<User>,
         @InjectRepository(RevokedToken) 
         private readonly refreshTokenRepository: Repository<RevokedToken>,
+
+        @InjectRepository(FundingProvider) 
+        private readonly providerRepository: Repository<FundingProvider>,
 
 
         @InjectRepository(Role)
@@ -71,7 +75,7 @@ export class AuthService {
       }
     }
 
-    public async registerUserProvider(userBody: AuthRegisterDto): Promise<User> {
+    public async registerUserProvider(userBody: AuthRegisterDto): Promise<{ message: string, provider: User }> {
       console.log('Registro de proveedor - Datos recibidos:', userBody);
     
       // Verificar si el email ya existe
@@ -113,11 +117,21 @@ export class AuthService {
         const savedUser = await this.userRepository.save(newUser);
         console.log('Proveedor guardado en la base de datos:', savedUser);
     
-        // Excluir las claves de la respuesta
-        // delete savedUser.privateKey;
-        // delete savedUser.accessKey;
+        // Ahora crear un registro en la entidad FundingProvider
+        const newProvider = this.providerRepository.create({
+          name: userBody.name,
+          accountNumber: null, // Inicializarlo o generar un número de cuenta si es necesario
+          status: 'active', // Estado inicial del proveedor
+          type: 'person', // Aquí puedes definir el tipo o ajustarlo según el DTO
+          privateKey: savedUser.privateKey, // Usar la misma privateKey generada para el user
+          accessKey: savedUser.accessKey, // Usar la misma accessKey generada para el user
+          createdBy: savedUser, // Asignar el mismo usuario creado
+        });
     
-        return savedUser;
+        await this.providerRepository.save(newProvider);
+        console.log('Registro del proveedor guardado en la entidad FundingProvider.');
+    
+        return { message: 'Proveedor registrado con éxito', provider: savedUser };
       } catch (error) {
         console.error('Error en registerUserProvider:', error);
         throw new HttpException('Error al registrar proveedor', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -125,27 +139,27 @@ export class AuthService {
     }
     
     
+    
  
-
     public async registerUserWithRole(
       userBody: AuthRegisterDto,
       roleName: UserRole,
       createdBy: { id: string; name: string; email: string; roles: any }
     ): Promise<User> {
       console.log('Registro de usuario - Datos recibidos:', userBody);
-  
+    
       // Verificar si el email ya existe
       const existingUser = await this.userRepository.findOne({ where: { email: userBody.email } });
       if (existingUser) {
         console.log('Email ya registrado:', userBody.email);
         throw new BadRequestException('El email ya está en uso.');
       }
-  
+    
       try {
         // Encriptar la contraseña
         const hashedPassword = await generateHash(userBody.password);
         console.log('Contraseña encriptada:', hashedPassword);
-  
+    
         // Verifica si el rol existe, si no, lo crea
         let role = await this.roleRepository.findOne({ where: { name: roleName } });
         if (!role) {
@@ -153,32 +167,32 @@ export class AuthService {
           role = this.roleRepository.create({ name: roleName });
           await this.roleRepository.save(role);
         }
-  
-        // Generar claves privadas solo para los roles relevantes
+    
+        // Generar las claves privateKey y accessKey solo para los roles relevantes
         let privateKey = null;
         let accessKey = null;
         if ([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER, UserRole.PROVIDER].includes(roleName)) {
           privateKey = uuidv4();
           accessKey = uuidv4();
         }
-  
+    
         // Crear nuevo usuario con la contraseña encriptada, asignar el rol y las claves
         const newUser = this.userRepository.create({
           ...userBody,
           password: hashedPassword,
           roles: [role],
           createdBy: { id: createdBy.id, name: createdBy.name, email: createdBy.email },
-          privateKey,  // Guardar la privateKey generada
-          accessKey,   // Guardar la accessKey generada
+          privateKey,  
+          accessKey,   
         });
-  
+    
         const savedUser = await this.userRepository.save(newUser);
         console.log('Usuario guardado en la base de datos:', savedUser);
-  
-        // Excluir las claves de la respuesta
-        delete savedUser.privateKey;
-        delete savedUser.accessKey;
-  
+    
+        // Excluir las claves de la respuesta si no deseas enviarlas al cliente
+        // delete savedUser.privateKey;
+        // delete savedUser.accessKey;
+    
         return savedUser;
       } catch (error) {
         console.error('Error en registerUserWithRole:', error);

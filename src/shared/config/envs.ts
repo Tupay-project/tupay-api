@@ -3,10 +3,15 @@ import * as joi from 'joi';
 
 interface EnvVars {
   PORT: number;
-  SENDGRID_API_KEY:string
-  SENDGRID_SENDER:string
+  // SENDGRID_API_KEY:string
+  // SENDGRID_SENDER:string
+  MAILER_EMAIL:string
+  MAILER_SECRET_KEY:string
+  PROD:boolean
 
-  
+  // MAILER_EMAIL: envVars.MAILER_EMAIL,
+  // MAILER_SECRET_KEY: envVars.MAILER_SECRET_KEY,
+  // PROD: envVars.PROD,
   JWT_ACCESS_TOKEN_SECRET: string;
   JWT_REFRESH_TOKEN_SECRET: string;
   JWT_ACCESS_TOKEN_EXPIRATION_TIME: string;
@@ -29,8 +34,13 @@ interface EnvVars {
 // Esquema de validación con Joi
 const envsSchema = joi.object({
   PORT: joi.number().required(),
-  SENDGRID_API_KEY:joi.string().required(),
-  SENDGRID_SENDER:joi.string().required(),
+  // SENDGRID_API_KEY:joi.string().required(),
+  // SENDGRID_SENDER:joi.string().required(),
+  MAILER_EMAIL:joi.string().required(),
+  MAILER_SECRET_KEY:joi.string().required(),
+  PROD:joi.boolean().required(),
+
+
 
 
   JWT_ACCESS_TOKEN_SECRET: joi.string().required(),
@@ -64,6 +74,9 @@ if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }
 
+// MAILER_EMAIL=flowermoreno7@gmail.com
+// MAILER_SECRET_KEY=diosymimadre.8
+// PROD=false
 // Asignación de las variables validadas a la interfaz EnvVars
 const envVars: EnvVars = value;
 
@@ -71,8 +84,12 @@ const envVars: EnvVars = value;
 export const envs = {
   PORT: envVars.PORT,
 
-  SENDGRID_API_KEY: envVars.SENDGRID_API_KEY,
-  SENDGRID_SENDER: envVars.SENDGRID_SENDER,
+  // SENDGRID_API_KEY: envVars.SENDGRID_API_KEY,
+  // SENDGRID_SENDER: envVars.SENDGRID_SENDER,
+  
+  MAILER_EMAIL: envVars.MAILER_EMAIL,
+  MAILER_SECRET_KEY: envVars.MAILER_SECRET_KEY,
+  PROD: envVars.PROD,
 
 
   JWT_ACCESS_TOKEN_SECRET: envVars.JWT_ACCESS_TOKEN_SECRET,

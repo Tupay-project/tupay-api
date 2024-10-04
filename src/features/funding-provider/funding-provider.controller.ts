@@ -20,8 +20,8 @@ import { JwtGuard } from '../auth/guards/auth.guard';
 import { User } from '../user/entities/user.entity';
 import { Customer } from '../customer/entities/customer.entity';
 
-@UseGuards(JwtGuard, RoleGuard)
-@UseGuards(ApiKeyGuard)
+// @UseGuards(JwtGuard, RoleGuard)
+// @UseGuards(ApiKeyGuard)
 @Controller('funding-provider')
 export class FundingProviderController {
   constructor(
@@ -85,7 +85,7 @@ async getCustomersByProviderId(@Param('providerId') providerId: string): Promise
   // }
 
   @Get('all')
-  @UseGuards(ApiKeyGuard)
+  // @UseGuards(ApiKeyGuard)
   @ApiOperation({ summary: 'Obtener todos los proveedores' })
   async getAllProviders(): Promise<User[]> {
     return this.fundingProviderService.getAllProviders();

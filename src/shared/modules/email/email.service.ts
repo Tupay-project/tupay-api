@@ -1,35 +1,40 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import * as sgMail from '@sendgrid/mail';
-import { envs } from 'src/shared/config';
-import { SendEmailDto } from './dto/send-email.dto';
+import { Injectable } from '@nestjs/common';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
-constructor(
-
-){
-  sgMail.setApiKey(envs.SENDGRID_API_KEY)
-}
-async sendEmail (sendEmailDto:SendEmailDto):Promise<void>{
-
-  try {
-    const msg ={
-     to:sendEmailDto.to,
-     from:sendEmailDto.from,
-     subject:sendEmailDto.subject,
-     html:sendEmailDto.html
-
-    }
-    await sgMail.send(msg); 
-
-    console.log('Correo enviado con éxito.');
+  private transporter: nodemailer.Transporter;
 
   
-  } catch (error) {
-    console.error('Error al enviar el correo electrónico:', error);
-    throw new HttpException('Error al enviar el correo electrónico', HttpStatus.INTERNAL_SERVER_ERROR);
-    
+
+// MAILER_EMAIL=flowermoreno7@gmail.com
+// MAILER_SECRET_KEY=xuagyvzcjbpqplwf
+  constructor() {
+    // Configura el transportador con las credenciales del servicio de correo (por ejemplo, Gmail, SMTP, etc.)
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail', // O el servicio SMTP que estés usando
+      auth: {
+        user: 'flowermoreno7@gmail.com',
+        pass: 'xuagyvzcjbpqplwf',
+      },
+    });
   }
 
-}
+  // Método para enviar correos
+  async sendEmail(to: string, subject: string, html: string): Promise<void> {
+    const mailOptions = {
+      from: 'flowermoreno7@gmail.com', // Remitente autorizado
+      to,
+      subject,
+      html,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log('Correo enviado con éxito.');
+    } catch (error) {
+      console.error('Error al enviar el correo:', error);
+      throw new Error('No se pudo enviar el correo.');
+    }
+  }
 }
