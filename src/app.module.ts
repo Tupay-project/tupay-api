@@ -7,6 +7,7 @@ import { CustomerModule } from './features/customer/customer.module';
 import { RoleModule } from './features/role/role.module';
 import { RolesService } from './features/role/role.service';
 import { FundingProviderModule } from './features/funding-provider/funding-provider.module';
+import { InterbankModule } from './features/integrations/interbank/interbank.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { FundingProviderModule } from './features/funding-provider/funding-provi
     UserModule,
     CustomerModule,
     RoleModule,
-    FundingProviderModule
+    FundingProviderModule,
+    InterbankModule
 
   
   ],

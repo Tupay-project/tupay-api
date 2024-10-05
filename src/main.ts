@@ -5,6 +5,7 @@ import { AllExceptionsFilter } from './shared/pipes/all-exceptions.filter';
 import { envs } from './shared/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { InterbankDocumentation } from './shared/modules';
 
 // import { WebhookService } from './shared/services/webhook.service';
 
@@ -38,21 +39,8 @@ async function bootstrap() {
   app.setViewEngine('hbs');  // Usamos Handlebars como motor de plantillas
 
 
-    // Configurar la documentación Swagger en un módulo aparte
-    // await DocumentationModule.setup(app);
+  InterbankDocumentation.setup(app);
 
-
-  // const webhookService = app.get(WebhookService);
-  // webhookService.setServer(io);
-
-  // io.on('connection', (socket) => {
-  //   console.log(`Cliente conectado: ${socket.id}`);
-  //   socket.on('disconnect', () => {
-  //     console.log(`Cliente desconectado: ${socket.id}`);
-  //   });
-  // });
-
-  // Iniciar la aplicación y escuchar en el puerto especificado
   await app.listen(envs.PORT);
   console.log(`Server running on port: ${envs.PORT}`);
 }
