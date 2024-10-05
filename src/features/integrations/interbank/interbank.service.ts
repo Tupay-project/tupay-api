@@ -1,41 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CustomerService } from 'src/features/customer/customer.service';
+import { Customer } from 'src/features/customer/entities/customer.entity';
+import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
+import { Invoice } from 'src/features/invoice/entities/invoice.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class InterbankService {
-  
-  // Enviar confirmación de transacción por correo
-  sendTransactionConfirmationEmail(): any {
-    // Lógica para enviar un correo de confirmación de transacción
-  }
+  constructor(
+    @InjectRepository(Invoice)
+    private readonly invoiceRepository: Repository<Invoice>, 
 
-  // Enviar recibo de pago por correo
-  sendPaymentReceiptEmail(): any {
-    // Lógica para enviar el recibo de pago por correo
-  }
+    @InjectRepository(Customer)
+    private readonly customerRepository: Repository<Customer>,
 
-  // Enviar notificación de retiro por correo
-  sendWithdrawalNotificationEmail(): any {
-    // Lógica para enviar una notificación de retiro
-  }
+    @InjectRepository(FundingProvider)
+    private readonly providerRepository: Repository<FundingProvider>,
 
-  // Enviar notificación de error por correo
-  sendErrorNotificationEmail(): any {
-    // Lógica para enviar una notificación de error
-  }
-
-  // Enviar correo de activación de cuenta
-  sendAccountActivationEmail(): any {
-    // Lógica para enviar un correo de activación de cuenta
-  }
-
-  // Enviar correo de restablecimiento de contraseña
-  sendPasswordResetEmail(): any {
-    // Lógica para enviar un correo de restablecimiento de contraseña
-  }
-
-  // Enviar notificación personalizada por correo
-  sendCustomNotificationEmail(): any {
-    // Lógica para enviar una notificación personalizada
-  }
+    private readonly customerService: CustomerService, 
+  ){}
 }

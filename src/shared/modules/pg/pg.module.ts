@@ -6,9 +6,9 @@ import { FundingProvider } from 'src/features/funding-provider/entities/provider
 import { BankTransaction } from 'src/features/invoice/entities/bank-transaction.entity';
 import { Invoice } from 'src/features/invoice/entities/invoice.entity';
 import { Loan } from 'src/features/loan/entities/loan.entity';
-import { Payment } from 'src/features/manager/entities/payment.entity';
 import { Transaction } from 'src/features/manager/entities/transaction.entity';
 import { WebhookLog } from 'src/features/manager/entities/webhook-log.entity';
+import { Payment } from 'src/features/payment/entitie/payment.entity';
 import { Permission } from 'src/features/role/entities/permission.entity';
 import { Role } from 'src/features/role/entities/roles.entity';
 import { RevokedToken } from 'src/features/user/entities/revokedToken.entity';
@@ -51,14 +51,14 @@ import { SeedEntity } from 'src/shared/seed/entitie/seed-entity';
       Invoice,
       Customer,
       WebhookLog,
-      Payment,
       FundingProvider,
       BankTransaction,
       Transaction,
       SeedEntity,
       // 
       Loan,
-      RevokedToken
+      RevokedToken,
+      Payment
     ])
 
 

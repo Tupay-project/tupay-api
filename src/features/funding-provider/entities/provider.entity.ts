@@ -3,6 +3,7 @@ import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
 import { Customer } from 'src/features/customer/entities/customer.entity';
 import { Invoice } from 'src/features/invoice/entities/invoice.entity';
 import { Transaction } from 'src/features/manager/entities/transaction.entity';
+import { Payment } from 'src/features/payment/entitie/payment.entity';
 import { User } from 'src/features/user/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne } from 'typeorm';
 
@@ -16,6 +17,10 @@ export class FundingProvider {
   @Column({ length: 100 })
   @Field() 
   name: string;
+
+
+  @OneToMany(() => Payment, (payment) => payment.invoice)
+  payments: Payment[];
 
   // @Column({ unique: true, length: 20 })
   // @Field() 

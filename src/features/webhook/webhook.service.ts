@@ -1,27 +1,36 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
-import { CreateWebhookDto } from './dto/create-webhook.dto';
-import { UpdateWebhookDto } from './dto/update-webhook.dto';
 
 @Injectable()
 export class WebhookService {
-  create(createWebhookDto: CreateWebhookDto) {
-    return 'This action adds a new webhook';
+  constructor(){
+    
+  }
+  
+  // Webhook para manejo de rechazo
+  handleReject(data: any) {
+    // Lógica para manejar el webhook de rechazo
+    return {
+      message: 'Webhook recibido - Transacción rechazada',
+      data,
+    };
   }
 
-  findAll() {
-    return `This action returns all webhook`;
+  // Webhook para manejo de éxito
+  handleSuccess(data: any) {
+    // Lógica para manejar el webhook de éxito
+    return {
+      message: 'Webhook recibido - Transacción exitosa',
+      data,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} webhook`;
-  }
-
-  update(id: number, updateWebhookDto: UpdateWebhookDto) {
-    return `This action updates a #${id} webhook`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} webhook`;
+  // Webhook para manejo de fallo
+  handleFail(data: any) {
+    // Lógica para manejar el webhook de fallo
+    return {
+      message: 'Webhook recibido - Transacción fallida',
+      data,
+    };
   }
 }

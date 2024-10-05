@@ -21,8 +21,8 @@ import { PaymentModule } from './features/payment/payment.module';
     RoleModule,
     // FundingProviderModule,
     InterbankModule,
-    InvoiceModule,
-    PaymentModule
+    // InvoiceModule,
+    // PaymentModule
     
 
   

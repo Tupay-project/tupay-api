@@ -1,34 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Controller, Post, Body } from '@nestjs/common';
 import { WebhookService } from './webhook.service';
-import { CreateWebhookDto } from './dto/create-webhook.dto';
-import { UpdateWebhookDto } from './dto/update-webhook.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@Controller('webhook')
+@ApiTags('webhooks')
+@Controller('webhooks')
 export class WebhookController {
   constructor(private readonly webhookService: WebhookService) {}
 
-  @Post()
-  create(@Body() createWebhookDto: CreateWebhookDto) {
-    return this.webhookService.create(createWebhookDto);
+  @Post('reject')
+  @ApiOperation({ summary: 'Webhook para manejar transacciones rechazadas' })
+  handleReject(@Body() data: any) {
+    return this.webhookService.handleReject(data);
   }
 
-  @Get()
-  findAll() {
-    return this.webhookService.findAll();
+  @Post('success')
+  @ApiOperation({ summary: 'Webhook para manejar transacciones exitosas' })
+  handleSuccess(@Body() data: any) {
+    return this.webhookService.handleSuccess(data);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.webhookService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWebhookDto: UpdateWebhookDto) {
-    return this.webhookService.update(+id, updateWebhookDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.webhookService.remove(+id);
+  @Post('fail')
+  @ApiOperation({ summary: 'Webhook para manejar transacciones fallidas' })
+  handleFail(@Body() data: any) {
+    return this.webhookService.handleFail(data);
   }
 }

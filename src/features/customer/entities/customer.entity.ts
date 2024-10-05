@@ -1,6 +1,7 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql'; // Importa los decoradores de GraphQL
 import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
 import { Invoice } from 'src/features/invoice/entities/invoice.entity';
+import { Payment } from 'src/features/payment/entitie/payment.entity';
 import { User } from 'src/features/user/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, ManyToOne } from 'typeorm';
 
@@ -10,6 +11,9 @@ export class Customer {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => ID) // Decorador de campo para GraphQL
   id: string;
+
+  @OneToMany(() => Payment, (payment) => payment.invoice)
+  payments: Payment[];
 
   @Column({ unique: true })
   @Field() // Decorador de campo para GraphQL

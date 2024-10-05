@@ -2,6 +2,7 @@ import { ObjectType, Field, ID } from '@nestjs/graphql'; // Importa los decorado
 import { Customer } from 'src/features/customer/entities/customer.entity';
 import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
 import { Transaction } from 'src/features/manager/entities/transaction.entity';
+import { Payment } from 'src/features/payment/entitie/payment.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 
 @ObjectType() // Decorador para GraphQL
@@ -78,4 +79,8 @@ export class Invoice {
   
   @Column({ nullable: true })
   totalAmount: number;
+
+
+  @OneToMany(() => Payment, (payment) => payment.invoice)
+  payments: Payment[];
 }
