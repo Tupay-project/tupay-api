@@ -8,17 +8,22 @@ import { RoleModule } from './features/role/role.module';
 import { RolesService } from './features/role/role.service';
 import { FundingProviderModule } from './features/funding-provider/funding-provider.module';
 import { InterbankModule } from './features/integrations/interbank/interbank.module';
+import { InvoiceModule } from './features/invoice/invoice.module';
+import { PaymentModule } from './features/payment/payment.module';
 
 @Module({
   imports: [
     //  config
     PgModule,
-    AuthModule,
-    UserModule,
-    CustomerModule,
+    // AuthModule,
+    // UserModule,
+    // CustomerModule,
     RoleModule,
-    FundingProviderModule,
-    InterbankModule
+    // FundingProviderModule,
+    InterbankModule,
+    InvoiceModule,
+    PaymentModule
+    
 
   
   ],

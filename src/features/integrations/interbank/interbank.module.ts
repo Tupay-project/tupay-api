@@ -8,8 +8,8 @@ import { CloudinaryModule } from 'src/shared/modules/cloudinary/cloudinary.modul
 @Module({
   controllers: [
     InterbankController,
-    // CashOutController,
-    // CashInController
+    CashOutController,
+    CashInController
   ],
   providers: [InterbankService,CashInService,CashOutService],
 
