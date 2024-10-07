@@ -17,14 +17,14 @@ export class RoleGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const { roles } = req.user;
      // Asegurarse de que req.user existe y tiene los roles
-    console.log('_____ROLES___DATA', req.user);
+    // console.log('_____ROLES___DATA', req.user);
     // console.log('_____ROLES___', roles);
 
     // Verificar si el usuario tiene al menos uno de los roles requeridos
     const hasRole = roles.some(role => requiredRoles.includes(role.name));
     
     if (!hasRole) {
-      console.log('El usuario no tiene el rol requerido');
+      // console.log('El usuario no tiene el rol requerido');
       throw new ForbiddenException('Forbidden resource'); // Denegar acceso
     }
 

@@ -1,8 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { Customer } from 'src/features/customer/entities/customer.entity';
-import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
-import { Loan } from 'src/features/loan/entities/loan.entity';
-import { Transaction } from 'src/features/manager/entities/transaction.entity';
+
 import { Role } from 'src/features/role/entities/roles.entity';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne, ManyToMany, JoinTable, OneToMany, ManyToOne } from 'typeorm';
 
@@ -50,16 +47,6 @@ export class User {
   @Field()
   status: string;
 
-  @OneToOne(() => Customer, customer => customer.user)
-  @JoinColumn()
-  @Field(() => Customer)
-  customer: Customer;
-
-  @ManyToOne(() => Loan, user => user.borrower)
-  loans: Loan;
-
-  @OneToMany(() => FundingProvider, provider => provider.createdBy)
-  providers: FundingProvider[];
 
   // Relación para indicar quién creó este usuario
   @ManyToOne(() => User, user => user.createdUsers)
@@ -96,7 +83,4 @@ export class User {
   @Field() 
   availableFunds: number;
 
-
-  @OneToMany(() => Transaction, (transaction) => transaction.user) // Relación con Transaction
-  transactions: Transaction[];
 }

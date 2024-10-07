@@ -15,8 +15,13 @@ export class InterbankDocumentation {
       return res.status(401).send('Authentication required.');
     }
 
+<<<<<<< HEAD
     const fixedUsername = 'interback-admin';  // Aquí defines el usuario
     const fixedPassword = 'VDVkU0IM43Ae/5u5'; // Aquí defines la contraseña
+=======
+    const fixedUsername = 'interback-admin'; 
+    const fixedPassword = 'VDVkU0IM43Ae/5u5'; 
+>>>>>>> features/integratins/interback
     if (username !== fixedUsername || password !== fixedPassword) {
       return res.status(401).send('Invalid username or password.');
     }

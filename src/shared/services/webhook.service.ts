@@ -1,11 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 // import { InjectRepository } from '@nestjs/typeorm';
 // import { Repository } from 'typeorm';
 // import { Webhook } from '../entities/webhook.entity';
 // import { SinglePayment } from '../entities/single-payment.entity';
 import { Server } from 'socket.io';
 import { validate as isUuid } from 'uuid';
-import axios from 'axios';
 
 @Injectable()
 export class WebhookService {
@@ -97,39 +96,6 @@ export class WebhookService {
     this.server.emit('paymentUpdate', { paymentId, status: newStatus, invoiceId });
   
     // console.log(`Payment ID: ${paymentId} updated to status: ${paymentToUpdate.status}`);
-  }
-
-
-  async notifyProvider(data: {
-    id: string;
-    amount: number;
-    status: string;
-    paymentReference: string;
-    customer: any;
-  }): Promise<void> {
-    const webhookUrl = data.customer.provider.webhookUrl;
-
-    if (!webhookUrl) {
-      throw new HttpException('No webhook URL found for provider', HttpStatus.BAD_REQUEST);
-    }
-
-    try {
-      // Llamada al webhook del proveedor con los datos de la transacción
-      await axios.post(webhookUrl, {
-        transactionId: data.id,
-        amount: data.amount,
-        status: data.status,
-        paymentReference: data.paymentReference,
-        customer: {
-          id: data.customer.id,
-          name: data.customer.name,
-          email: data.customer.email,
-        },
-      });
-    } catch (error) {
-      console.error(`Error enviando notificación al webhook: ${error.message}`);
-      throw new HttpException('Error enviando notificación al proveedor', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
   }
   
 }

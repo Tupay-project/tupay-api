@@ -1,74 +1,35 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { ManagerService } from './manager.service';
 import { Manager } from './entities/manager.entity';
-import { Invoice } from '../invoice/entities/invoice.entity';
-import { Customer } from '../customer/entities/customer.entity';
-import { FundingProvider } from '../funding-provider/entities/provider.entity';
-import { Payment } from './entities/payment.entity';
-import { Transaction } from './entities/transaction.entity';
+import { CreateManagerInput } from './dto/create-manager.input';
+import { UpdateManagerInput } from './dto/update-manager.input';
 
 @Resolver(() => Manager)
 export class ManagerResolver {
   constructor(private readonly managerService: ManagerService) {}
 
-  // Resolver para obtener todos los proveedores de fondos
-  @Query(() => [FundingProvider], { name: 'getAllFundingProviders' })
-  async getAllFundingProviders() {
-    return this.managerService.getAllFundingProviders();
+  @Mutation(() => Manager)
+  createManager(@Args('createManagerInput') createManagerInput: CreateManagerInput) {
+    return this.managerService.create(createManagerInput);
   }
 
-  // Resolver para obtener un proveedor de fondos por ID
-  @Query(() => FundingProvider, { name: 'getFundingProviderById' })
-  async getFundingProviderById(@Args('id') id: string) {
-    return this.managerService.getFundingProviderById(id);
+  @Query(() => [Manager], { name: 'manager' })
+  findAll() {
+    return this.managerService.findAll();
   }
 
-  // Resolver para obtener todos los clientes
-  @Query(() => [Customer], { name: 'getAllCustomers' })
-  async getAllCustomers() {
-    return this.managerService.getAllCustomers();
+  @Query(() => Manager, { name: 'manager' })
+  findOne(@Args('id', { type: () => Int }) id: number) {
+    return this.managerService.findOne(id);
   }
 
-  // Resolver para obtener un cliente por ID
-  @Query(() => Customer, { name: 'getCustomerById' })
-  async getCustomerById(@Args('id') id: string) {
-    return this.managerService.getCustomerById(id);
+  @Mutation(() => Manager)
+  updateManager(@Args('updateManagerInput') updateManagerInput: UpdateManagerInput) {
+    return this.managerService.update(updateManagerInput.id, updateManagerInput);
   }
 
-  // Resolver para obtener todas las facturas
-  @Query(() => [Invoice], { name: 'getAllInvoices' })
-  async getAllInvoices() {
-    return this.managerService.getAllInvoices();
+  @Mutation(() => Manager)
+  removeManager(@Args('id', { type: () => Int }) id: number) {
+    return this.managerService.remove(id);
   }
-
-  // Resolver para obtener una factura por ID
-  @Query(() => Invoice, { name: 'getInvoiceById' })
-  async getInvoiceById(@Args('id') id: string) {
-    return this.managerService.getInvoiceById(id);
-  }
-
-  // Resolver para obtener todos los pagos
-  @Query(() => [Payment], { name: 'getAllPayments' })
-  async getAllPayments() {
-    return this.managerService.getAllPayments();
-  }
-
-  // Resolver para obtener un pago por ID
-  @Query(() => Payment, { name: 'getPaymentById' })
-  async getPaymentById(@Args('id') id: string) {
-    return this.managerService.getPaymentById(id);
-  }
-
-  // Resolver para obtener todas las transacciones
-  @Query(() => [Transaction], { name: 'getAllTransactions' })
-  async getAllTransactions() {
-    return this.managerService.getAllTransactions();
-  }
-
-  // Resolver para obtener una transacción por ID
-  @Query(() => Transaction, { name: 'getTransactionById' })
-  async getTransactionById(@Args('id') id: string) {
-    return this.managerService.getTransactionById(id);
-  }
-
 }

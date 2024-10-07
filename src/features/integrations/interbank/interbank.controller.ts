@@ -1,12 +1,19 @@
+<<<<<<< HEAD
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Controller, Post, Get, Body, Param, HttpException, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { EnterBasicDataDto } from './dtos/EnterBasicDataDto';
 import { GenerateTransactionDto } from './dtos/GenerateTransactionDto';
+=======
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { InterbankService } from './interbank.service';
+import { CreateSessionDto } from './dtos/create-session.dto';
+>>>>>>> features/integratins/interback
 
 @ApiTags('interbank')
 @Controller('interbank')
 export class InterbankController {
+<<<<<<< HEAD
   // 1. SGW - Recibe nombre y monto
   @Post('receive-parameters')
   @ApiOperation({ summary: 'Recibe nombre y monto para procesar' })
@@ -71,5 +78,33 @@ export class InterbankController {
       facturaId,
       clientId,
     };
+=======
+  constructor(private readonly interbankService: InterbankService) {}
+
+  @Post('create-session')
+  async createPaymentSession(
+    @Body() createInterbankDto: CreateSessionDto,
+  ): Promise<{ sessionId: string }> {
+    const sessionId =
+      await this.interbankService.createPaymentSession(createInterbankDto);
+    return { sessionId };
+  }
+
+  // Método para procesar el pago con el sessionId
+  @Post('process-payment/:sessionId')
+  async processPayment(
+    @Param('sessionId') sessionId: string,
+  ): Promise<{ status: string; message: string }> {
+    return await this.interbankService.processPayment(sessionId);
+  }
+
+  // Método para obtener el estado del pago usando el sessionId
+  @Get('payment-status/:sessionId')
+  async getPaymentStatus(
+    @Param('sessionId') sessionId: string,
+  ): Promise<{ status: string }> {
+    const status = await this.interbankService.getPaymentStatus(sessionId);
+    return { status };
+>>>>>>> features/integratins/interback
   }
 }

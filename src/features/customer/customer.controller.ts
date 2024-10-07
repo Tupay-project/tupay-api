@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Body, ConflictException, Controller, Get, Param, Post, Put, SetMetadata, UseGuards, NotFoundException } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -92,4 +93,12 @@ export class CustomerController {
   }
 
  
+=======
+import { Controller } from '@nestjs/common';
+import { CustomerService } from './customer.service';
+
+@Controller('customer')
+export class CustomerController {
+  constructor(private readonly customerService: CustomerService) {}
+>>>>>>> features/integratins/interback
 }

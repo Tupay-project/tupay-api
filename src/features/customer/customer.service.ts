@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -97,3 +98,9 @@ export class CustomerService {
 
 
 }
+=======
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class CustomerService {}
+>>>>>>> features/integratins/interback
