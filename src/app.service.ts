@@ -1,9 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { RolesService } from "./features/role/role.service";
 
 @Injectable()
 export class AppService {
-  constructor(private readonly rolesService: RolesService) {}
+  constructor(private readonly rolesService: any) {}
 
   async onModuleInit() {
     const roles = await this.rolesService.listAllRoles();

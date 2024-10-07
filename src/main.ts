@@ -1,11 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { AllExceptionsFilter } from './shared/pipes/all-exceptions.filter';
-import { envs } from './shared/config';
+
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-import { InterbankDocumentation } from './shared/modules';
 
 // import { WebhookService } from './shared/services/webhook.service';
 
@@ -25,7 +23,6 @@ async function bootstrap() {
   );
 
   // Usar un filtro global de excepciones
-  app.useGlobalFilters(new AllExceptionsFilter());
 
   // Configurar CORS
   app.enableCors({
@@ -39,10 +36,8 @@ async function bootstrap() {
   app.setViewEngine('hbs');  // Usamos Handlebars como motor de plantillas
 
 
-  InterbankDocumentation.setup(app);
 
-  await app.listen(envs.PORT);
-  console.log(`Server running on port: ${envs.PORT}`);
+
 }
 
 bootstrap();
