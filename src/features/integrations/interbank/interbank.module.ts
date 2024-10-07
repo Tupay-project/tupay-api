@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { InterbankService } from './interbank.service';
 import { InterbankController } from './interbank.controller';
-import { CashInController,CashInService,CashOutController,CashOutService } from '.';
+import { EmailModule } from 'src/shared/modules/email/email.module';
 
 @Module({
-  controllers: [InterbankController,CashInController,CashOutController],
-  providers: [InterbankService,CashInService,CashOutService]
+  controllers: [InterbankController],
+  providers: [InterbankService],
+  imports:[EmailModule]
+
 })
 export class InterbankModule {}

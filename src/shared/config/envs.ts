@@ -3,15 +3,6 @@ import * as joi from 'joi';
 
 interface EnvVars {
   PORT: number;
-  // SENDGRID_API_KEY:string
-  // SENDGRID_SENDER:string
-  MAILER_EMAIL:string
-  MAILER_SECRET_KEY:string
-  PROD:boolean
-
-  // MAILER_EMAIL: envVars.MAILER_EMAIL,
-  // MAILER_SECRET_KEY: envVars.MAILER_SECRET_KEY,
-  // PROD: envVars.PROD,
   JWT_ACCESS_TOKEN_SECRET: string;
   JWT_REFRESH_TOKEN_SECRET: string;
   JWT_ACCESS_TOKEN_EXPIRATION_TIME: string;
@@ -27,22 +18,11 @@ interface EnvVars {
   TOKU_ACCOUNT_KEY: string;
   TOKU_API_KEY: string;
   TOKU_API_BASE_URL: string;
-  // 
-  STRIPE_SECRET_KEY:string
 }
 
 // Esquema de validación con Joi
 const envsSchema = joi.object({
   PORT: joi.number().required(),
-  // SENDGRID_API_KEY:joi.string().required(),
-  // SENDGRID_SENDER:joi.string().required(),
-  MAILER_EMAIL:joi.string().required(),
-  MAILER_SECRET_KEY:joi.string().required(),
-  PROD:joi.boolean().required(),
-
-
-
-
   JWT_ACCESS_TOKEN_SECRET: joi.string().required(),
   JWT_REFRESH_TOKEN_SECRET: joi.string().required(),
   JWT_ACCESS_TOKEN_EXPIRATION_TIME: joi.string().required(),
@@ -58,10 +38,6 @@ const envsSchema = joi.object({
   TOKU_ACCOUNT_KEY: joi.string().required(),
   TOKU_API_KEY: joi.string().required(),
   TOKU_API_BASE_URL: joi.string().uri().required(),
-
-  // 
-  STRIPE_SECRET_KEY: joi.string(),
-
 }).unknown(true);
 
 // Validación de las variables de entorno
@@ -74,24 +50,12 @@ if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }
 
-// MAILER_EMAIL=flowermoreno7@gmail.com
-// MAILER_SECRET_KEY=diosymimadre.8
-// PROD=false
 // Asignación de las variables validadas a la interfaz EnvVars
 const envVars: EnvVars = value;
 
 // Exportación de las variables de entorno validadas
 export const envs = {
   PORT: envVars.PORT,
-
-  // SENDGRID_API_KEY: envVars.SENDGRID_API_KEY,
-  // SENDGRID_SENDER: envVars.SENDGRID_SENDER,
-  
-  MAILER_EMAIL: envVars.MAILER_EMAIL,
-  MAILER_SECRET_KEY: envVars.MAILER_SECRET_KEY,
-  PROD: envVars.PROD,
-
-
   JWT_ACCESS_TOKEN_SECRET: envVars.JWT_ACCESS_TOKEN_SECRET,
   JWT_REFRESH_TOKEN_SECRET: envVars.JWT_REFRESH_TOKEN_SECRET,
   JWT_ACCESS_TOKEN_EXPIRATION_TIME: envVars.JWT_ACCESS_TOKEN_EXPIRATION_TIME,
@@ -107,5 +71,4 @@ export const envs = {
   TOKU_ACCOUNT_KEY: envVars.TOKU_ACCOUNT_KEY,
   TOKU_API_KEY: envVars.TOKU_API_KEY,
   TOKU_API_BASE_URL: envVars.TOKU_API_BASE_URL,
-  STRIPE_SECRET_KEY: envVars.STRIPE_SECRET_KEY,
 };

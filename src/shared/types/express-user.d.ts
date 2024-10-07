@@ -2,7 +2,7 @@ declare namespace Express {
     interface User {
       roles: any;
       id: string;
-      name: string;
+      username: string;
       email: string;
     }
   }

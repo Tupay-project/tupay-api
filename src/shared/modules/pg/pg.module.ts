@@ -2,22 +2,15 @@ import { Module, Global } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
 import { Customer } from 'src/features/customer/entities/customer.entity';
-import { FundingProvider } from 'src/features/funding-provider/entities/provider.entity';
-import { BankTransaction } from 'src/features/invoice/entities/bank-transaction.entity';
-import { Invoice } from 'src/features/invoice/entities/invoice.entity';
-import { Loan } from 'src/features/loan/entities/loan.entity';
-import { Payment } from 'src/features/manager/entities/payment.entity';
-import { Transaction } from 'src/features/manager/entities/transaction.entity';
-import { WebhookLog } from 'src/features/manager/entities/webhook-log.entity';
+import { Interbank } from 'src/features/integrations/interbank/entities/interbank.entity';
+import { Invoice } from 'src/features/invoices/entities/invoice.entity';
+import { PaymentProvider } from 'src/features/provider/entities/provider.entity';
 import { Permission } from 'src/features/role/entities/permission.entity';
 import { Role } from 'src/features/role/entities/roles.entity';
 import { RevokedToken } from 'src/features/user/entities/revokedToken.entity';
 import { User } from 'src/features/user/entities/user.entity';
+
 import { envs } from 'src/shared/config';
-
-import { SeedEntity } from 'src/shared/seed/entitie/seed-entity';
-
-
 
 
 @Global()
@@ -26,8 +19,8 @@ import { SeedEntity } from 'src/shared/seed/entitie/seed-entity';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: envs.DATABASE_HOST,
-      port: envs.DATABASE_PORT,
-      username: envs.DATABASE_USERNAME,
+      port: 16751,
+      username:  envs.DATABASE_USERNAME,
       password: envs.DATABASE_PASSWORD,
       database: envs.DATABASE_NAME,
       synchronize: true,
@@ -45,20 +38,14 @@ import { SeedEntity } from 'src/shared/seed/entitie/seed-entity';
 
     TypeOrmModule.forFeature([
       User,
+      RevokedToken,
       Role,
       Permission,
       ApiKey,
+      PaymentProvider ,
       Invoice,
-      Customer,
-      WebhookLog,
-      Payment,
-      FundingProvider,
-      BankTransaction,
-      Transaction,
-      SeedEntity,
-      // 
-      Loan,
-      RevokedToken
+      Interbank,
+      Customer
     ])
 
 
