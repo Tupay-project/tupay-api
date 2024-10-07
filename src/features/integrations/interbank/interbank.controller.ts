@@ -1,11 +1,17 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { InterbankService } from './interbank.service';
 import { CreateSessionDto } from './dtos/create-session.dto';
 
+@ApiTags('Interbank') // Categoría en Swagger
 @Controller('interbank')
 export class InterbankController {
   constructor(private readonly interbankService: InterbankService) {}
 
+  @ApiOperation({ summary: 'Crear una sesión de pago' }) // Descripción de la operación
+  @ApiResponse({ status: 201, description: 'Sesión de pago creada exitosamente.' })
+  @ApiResponse({ status: 400, description: 'Solicitud inválida.' })
+  @ApiBody({ type: CreateSessionDto }) // Documentación del cuerpo del request
   @Post('create-session')
   async createPaymentSession(
     @Body() createInterbankDto: CreateSessionDto,
@@ -15,7 +21,10 @@ export class InterbankController {
     return { sessionId };
   }
 
-  // Método para procesar el pago con el sessionId
+  @ApiOperation({ summary: 'Procesar un pago' })
+  @ApiParam({ name: 'sessionId', description: 'ID de la sesión de pago' }) // Parámetro en la URL
+  @ApiResponse({ status: 200, description: 'Pago procesado correctamente.' })
+  @ApiResponse({ status: 404, description: 'Sesión no encontrada.' })
   @Post('process-payment/:sessionId')
   async processPayment(
     @Param('sessionId') sessionId: string,
@@ -23,7 +32,10 @@ export class InterbankController {
     return await this.interbankService.processPayment(sessionId);
   }
 
-  // Método para obtener el estado del pago usando el sessionId
+  @ApiOperation({ summary: 'Obtener el estado del pago' })
+  @ApiParam({ name: 'sessionId', description: 'ID de la sesión de pago' })
+  @ApiResponse({ status: 200, description: 'Estado del pago obtenido correctamente.' })
+  @ApiResponse({ status: 404, description: 'Sesión no encontrada.' })
   @Get('payment-status/:sessionId')
   async getPaymentStatus(
     @Param('sessionId') sessionId: string,
