@@ -70,17 +70,26 @@ export class ProviderService {
   }
 
   // Obtener detalles de un proveedor
-//   async getProviderById(providerId: string): Promise<PaymentProvider> {
-//     const provider = await this.providerRepository.findOne({
-//       where: { id: providerId },
-//     });
-
-//     if (!provider) {
-//       throw new NotFoundException('Proveedor no encontrado');
-//     }
-
-//     return provider;
-//   }
+  async getProviderByKeys(accessKey: string, privateKey: string): Promise<PaymentProvider | null> {
+    console.log('AccessKey recibida en el servicio:', accessKey);
+    console.log('PrivateKey recibida en el servicio:', privateKey);
+  
+    const user = await this.providerRepository.findOne({
+      where: { accessKey, privateKey },  // Busca en la entidad User
+    });
+  
+    if (!user) {
+      console.log('proveedor  no encontrado en la base de datos con las claves proporcionadas.');
+      return null;
+    }
+  
+    // Excluir las claves de la respuesta
+    delete user.privateKey;
+    delete user.accessKey;
+  
+    return user;
+  }
+  
 
   async getProviderById(providerId: string): Promise<Partial<PaymentProvider>> {
     const provider = await this.providerRepository.findOne({

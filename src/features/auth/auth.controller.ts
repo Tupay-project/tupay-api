@@ -36,7 +36,7 @@ export class AuthController {
 
   
   @UseGuards(JwtGuard, RoleGuard)
-  @SetMetadata('roles', 'admin') 
+  @SetMetadata('roles', 'user') 
   @Post('register-provider')
   async handleRegisterProvider(@Body() registerBody: AuthRegisterDto) {
     try {

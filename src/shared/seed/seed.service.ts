@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { faker } from '@faker-js/faker';  // Nueva importación de faker
@@ -11,7 +11,6 @@ export class SeedService {
     private readonly seedRepository: Repository<SeedEntity>,
   ) {}
 
-  // Modificamos para aceptar la cantidad desde el controlador
   async runSeed(quantity: number) {
     // Crear un array de datos falsos basado en la cantidad recibida
     const seedData = Array(quantity).fill(0).map(() => {
@@ -21,6 +20,37 @@ export class SeedService {
     // Guardar los datos falsos en la base de datos
     await this.seedRepository.save(seedData);
   }
+
+  async findAll() {
+    return await this.seedRepository.find();
+  }
+
+  async findById(id: string) {
+    const seed = await this.seedRepository.findOne({ where: { id } });
+    if (!seed) {
+      throw new NotFoundException(`Seed with ID ${id} not found`);
+    }
+    return seed;
+  }
+
+  async findByUserRole(role: string) {
+    return await this.seedRepository.find({ where: { userRole: role } });
+  }
+
+  
+
+  async updateSeed(id: string, updateData: Partial<SeedEntity>) {
+    const seed = await this.findById(id);
+    Object.assign(seed, updateData);
+    return await this.seedRepository.save(seed);
+  }
+
+  async deleteSeed(id: string) {
+    const seed = await this.findById(id);
+    return await this.seedRepository.remove(seed);
+  }
+
+
 
   private generateFakeData(): Partial<SeedEntity> {
     return {
@@ -86,4 +116,6 @@ export class SeedService {
       updatedAt: faker.date.recent(),
     };
   }
+
+  
 }

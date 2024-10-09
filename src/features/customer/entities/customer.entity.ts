@@ -2,6 +2,7 @@ import { Interbank } from 'src/features/integrations/interbank/entities/interban
 import { Invoice } from 'src/features/invoices/entities/invoice.entity';
 import { PaymentProvider } from 'src/features/provider/entities/provider.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm';
+import { Exclude } from 'class-transformer';  // Importamos Exclude
 
 @Entity('customers')
 export class Customer {
@@ -23,9 +24,10 @@ export class Customer {
   @Column()  
   phoneNumber: string;  // Número de teléfono del cliente
 
-  @OneToMany(() => Invoice, (invoice) => invoice.customer)
-  invoices: Invoice[];
+  // @OneToMany(() => Invoice, (invoice) => invoice.customer)
+  // invoices: Invoice[];
 
   @ManyToOne(() => PaymentProvider, (provider) => provider.customers, { eager: true })
+  @Exclude()  // Excluye el campo provider de la serialización
   provider: PaymentProvider;
 }

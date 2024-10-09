@@ -10,6 +10,8 @@ import { InterbankModule } from './features/integrations/interbank/interbank.mod
 import { TokuModule } from './features/integrations/toku/toku.module';
 import { AuthModule } from './features/auth/auth.module';
 import { EmailModule } from './shared/modules/email/email.module';
+import { SeedModule } from './shared/seed/seed.module';
+import { PaymentModule } from './features/payment/payment.module';
 
 
 @Module({
@@ -17,12 +19,13 @@ import { EmailModule } from './shared/modules/email/email.module';
     //  config
     PgModule,
     ProviderModule,
-    CustomerModule,
+    // CustomerModule,
     InvoicesModule,
     InterbankModule,
     TokuModule,
     AuthModule,
-    EmailModule
+    EmailModule,
+    PaymentModule
     // features
 
 

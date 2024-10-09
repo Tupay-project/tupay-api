@@ -1,8 +1,10 @@
 import { Customer } from 'src/features/customer/entities/customer.entity';
 import { Interbank } from 'src/features/integrations/interbank/entities/interbank.entity';
 import { User } from 'src/features/user/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
+import { Role } from 'src/features/role/entities/roles.entity';
 
 @Entity('providers')
 export class PaymentProvider  {
@@ -53,5 +55,11 @@ export class PaymentProvider  {
   @Exclude()  // Excluye createdBy de la serialización
 
   createdBy: User;
+
+  // 
+  @OneToMany(() => ApiKey, (apiKey) => apiKey.fundingProvider)
+  apiKeys: ApiKey[]; 
+
+ 
   
 }

@@ -33,9 +33,9 @@ export class Interbank {
   @JoinColumn({ name: 'provider_id' })
   provider: PaymentProvider;
 
-  @ManyToOne(() => Invoice, (invoice) => invoice.payments, { eager: true })
-  @JoinColumn({ name: 'invoice_id' })
-  invoice: Invoice;
+  // @ManyToOne(() => Invoice, (invoice) => invoice.payments, { eager: true })
+  // @JoinColumn({ name: 'invoice_id' })
+  // invoice: Invoice;
 
   @Column({ type: 'enum', enum: PaymentStatus })
   status: PaymentStatus;

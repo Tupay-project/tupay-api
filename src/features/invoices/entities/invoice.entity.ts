@@ -1,60 +1,57 @@
-import { Customer } from 'src/features/customer/entities/customer.entity';
-import { Interbank } from 'src/features/integrations/interbank/entities/interbank.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('invoices')
 export class Invoice {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-  @ManyToOne(() => Customer, (customer) => customer.invoices, { eager: true })
-  customer: Customer;
+    @Column({ type: 'decimal' })
+    amount: number;
 
+    @Column()
+    description: string;
 
+    @Column()
+    issueDate: Date;
 
-  @Column('decimal', {
-    precision: 10,
-    scale: 2,
-    transformer: {
-      to: (value: number) => value,
-      from: (value: string) => parseFloat(value),
-    },
-  })
-  amount: number;  // Monto de la factura
+    @Column()
+    dueDate: Date;
 
-  @Column()
-  description: string;  // Descripción del producto o servicio
+    @Column({ unique: true })
+    paymentReference: string;
 
-  @Column()
-  issueDate: Date;  // Fecha de emisión de la factura
+    @Column()
+    paymentLink: string;
 
-  @Column()
-  dueDate: Date;  // Fecha de vencimiento de la factura
+    @Column({ default: 'pending' })
+    status: string;
 
-  @Column({ default: 'pending' })
-  status: string;  // Estado de la factura (e.g., 'pending', 'paid', 'overdue')
+    // Información del cliente, que se toma directamente del DTO
+    @Column()
+    numdoc: string;
 
-  @Column({ default: '1232' })
-  numberAgreement: string;  // Número de convenio fijo
+    @Column()
+    username: string;
 
-  @Column({ length: 15, unique: true })
-  paymentReference: string;  // Referencia de pago generada automáticamente (5 dígitos)
+    @Column()
+    userphone: string;
 
-  @Column()
-  paymentLink: string;  // Link de pago generado
+    @Column()
+    useremail: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+    @Column()
+    typetransaction: string;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+    @Column()
+    method: string;
 
-  @Column({ nullable: true })
-  pdfUrl: string;
+    // ID del usuario que crea el enlace (creador de la factura)
+    @Column()
+    createdBy: string;  // Almacenamos el ID del usuario autenticado
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  clientName: string;
+    @CreateDateColumn()
+    createdAt: Date;
 
-  @OneToMany(() => Interbank, (payment) => payment.invoice)
-  payments: Interbank[];
+    @UpdateDateColumn()
+    updatedAt: Date;
 }
