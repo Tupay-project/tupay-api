@@ -1,39 +1,32 @@
-import { Controller, Get, Query, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Req, UseGuards } from '@nestjs/common';
 import { PaymentsService } from './payment.service';
+import { ProcessPaymentDto } from './dto/process-payment.dto';
+// import { JwtGuard } from '../auth/guards/auth.guard';
 
+
+// @UseGuards(JwtGuard)
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
-
-  @Get()
-  async processPayment(
-    @Query('reference') reference: string,
-    @Query('amount') amount: string,
-    @Query('currency') currency: string,
-    @Query('numdoc') numdoc: string,
-    @Query('username') username: string,
-    @Query('userphone') userphone: string,
-    @Query('useremail') useremail: string,
-    @Query('typetransaction') typetransaction: string,
-    @Query('method') method: string,
-    @Query('providerId') providerId: string,  // ID del proveedor
-  ) {
+  @Post('process')
+  async processPayment(@Body() processPaymentDto: ProcessPaymentDto) {
     try {
-      return await this.paymentsService.processPayment(
-        reference,
-        amount,
-        currency,
-        numdoc,
-        username,
-        userphone,
-        useremail,
-        typetransaction,
-        method,
-        providerId,
+      // Aquí NO necesitas el providerId del token JWT, solo los datos del cliente
+      const result = await this.paymentsService.processPayment(
+        processPaymentDto.reference,
+        processPaymentDto.amount,
+        processPaymentDto.currency,
+        processPaymentDto.numdoc,
+        processPaymentDto.username,
+        processPaymentDto.userphone,
+        processPaymentDto.useremail,
+        processPaymentDto.typetransaction,
+        processPaymentDto.method
       );
+      return result;
     } catch (error) {
-      console.error('Error procesando el pago:', error);
-      throw new HttpException('Error al procesar el pago', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+  
 }

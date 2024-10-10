@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Invoice } from './entities/invoice.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -43,6 +43,20 @@ export class InvoicesService {
             console.error('Error creando factura:', error);
             throw new HttpException('Error al crear la factura', HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+     // Nuevo método para buscar por referencia y verificar estado
+     async checkPaymentStatus(reference: string): Promise<Invoice> {
+        // Buscar la factura por su referencia
+        const invoice = await this.invoiceRepository.findOne({ where: { paymentReference: reference } });
+
+        // Si no se encuentra la factura, lanzar un error
+        if (!invoice) {
+            throw new NotFoundException(`Factura con referencia ${reference} no encontrada`);
+        }
+
+        // Devolver la factura encontrada
+        return invoice;
     }
 }
 
