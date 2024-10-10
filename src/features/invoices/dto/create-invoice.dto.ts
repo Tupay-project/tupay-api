@@ -11,8 +11,8 @@ export class CreateInvoiceDto {
 
   @ApiProperty({ description: 'Descripción del producto o servicio', example: 'Compra de productos' })
   @IsString()
-  @IsNotEmpty()
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @ApiProperty({ description: 'Fecha de emisión', example: '2024-09-28T00:00:00Z' })
   @IsDateString()
