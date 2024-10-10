@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { PaymentProvider } from 'src/features/provider/entities/provider.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
 
 @Entity('invoices')
 export class Invoice {
@@ -54,4 +55,17 @@ export class Invoice {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Column({nullable:true})
+    accountNumber: string;
+
+    @Column({nullable:true})
+    bankAgreementNumber: string;
+
+    @Column({nullable:true})
+    paymentReceipt: string;
+    // 
+
+ @ManyToOne(() => PaymentProvider, { nullable: true })
+provider: PaymentProvider;
 }

@@ -7,20 +7,35 @@ export class Payment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'decimal' })
-  amount: number;  // Monto del pago
+  @Column({ type: 'decimal', nullable: false })
+  amount: number;  // Monto del pago (obligatorio)
 
-  @Column()
-  currency: string;  // Moneda (COP, USD, etc.)
+  @Column({ nullable: false })
+  currency: string;  // Moneda (COP, USD, etc.) (obligatorio)
 
-  @Column({ default: 'pending' })
-  status: string;  // Estado del pago (pending, completed, failed, etc.)
-
-  @Column()
-  method: string;  // Método de pago (GEN, PSE, etc.)
+  @Column({ default: 'pending', nullable: true })
+  status: string;  // Estado del pago (opcional)
 
   @Column({ nullable: true })
-  paymentReference: string;  // Referencia de la pasarela de pagos
+  method: string;  // Método de pago (opcional)
+
+  @Column({ nullable: true })
+  paymentReference: string;  // Referencia de la pasarela de pagos (opcional)
+
+  @Column({ nullable: true })
+  bankAgreementNumber: string;  // Número de acuerdo con el banco (opcional)
+
+  @Column({ nullable: true })
+  paymentReceipt: string;  // Recibo de pago (opcional)
+
+  @Column({ nullable: true })
+  accountNumber: string;  // Número de cuenta (opcional)
+
+  @Column({ nullable: true })
+  accountType: string;  // Tipo de cuenta (opcional)
+
+  @Column({ nullable: true })
+  supportDocument: string;  // Documento de soporte (opcional)
 
   // Relación con el cliente que realizó el pago
   @ManyToOne(() => Customer, (customer) => customer.payments, { eager: true })
@@ -34,5 +49,5 @@ export class Payment {
   createdAt: Date;  // Cuándo se generó la transacción
 
   @UpdateDateColumn()
-  updatedAt: Date;  // Cuándo se actualizó la transacción (por ejemplo, cuando se confirmó)
+  updatedAt: Date;  // Cuándo se actualizó la transacción
 }

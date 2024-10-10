@@ -30,6 +30,21 @@ export class CreateInvoiceDto {
   @IsNotEmpty()
   reference: string;
 
+  @ApiProperty({ description: 'Número de cuenta bancaria', example: '1234567890' })
+  @IsString()
+  @IsNotEmpty()
+  accountNumber: string;
+
+  @ApiProperty({ description: 'Número de convenio con el banco', example: '2686' })
+  @IsString()
+  @IsNotEmpty()
+  bankAgreementNumber: string;
+
+  @ApiProperty({ description: 'Número de recibo', example: '12345' })
+  @IsString()
+  @IsNotEmpty()
+  paymentReceipt: string;
+
 
   @ApiProperty({ description: 'Tipo de moneda', example: 'COP' })
   @IsString()

@@ -4,7 +4,6 @@ import { User } from 'src/features/user/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { ApiKey } from 'src/features/api-key/entities/api-key.entity';
-import { Role } from 'src/features/role/entities/roles.entity';
 
 @Entity('providers')
 export class PaymentProvider  {
